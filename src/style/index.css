@@ -3,11 +3,12 @@
 	margin: 0;
 	font-family: var(--font);
 	box-sizing: border-box;
+	background-color: transparent;
 }
 
 :root {
 	font-size: 12pt;
-	--red: #ff4f5e;
+	--red: #ff415a;
 
 	--theme: #5793ff;
 
@@ -15,9 +16,10 @@
 	--green: #1bd6ae;
 	--dark-green: #09bb94;
 	--yellow: #ffd95c;
-	--dark-yellow: #ffbd2b;
+	--dark-yellow: #ffb641;
 
-	--theme-gradient: linear-gradient(45deg, var(--red), var(--blue));
+	--theme-gradient: linear-gradient(45deg, var(--red), var(--theme));
+	--warn-gradient: linear-gradient(45deg, var(--red), var(--dark-yellow));
 
 	--dark-blue: rgb(21, 27, 63);
 
@@ -188,6 +190,28 @@ body {
 	opacity: 1;
 }
 
+.button-emoji {
+	font-weight: 500;
+	text-transform: initial;
+}
+
+.button-emoji span {
+	font-size: 1.2rem;
+	display: inline-block;
+	vertical-align: middle;
+	position: relative;
+	top: -2.5px;
+}
+
+.button-subtle {
+	border: none;
+	background-color: transparent;
+}
+.button-subtle::after,
+.button-subtle::before {
+	content: none;
+}
+
 #page-main {
 	background-color: var(--bg);
 }
@@ -210,4 +234,29 @@ body {
 	font-weight: 500;
 	color: var(--text-light-2);
 	text-align: center;
+}
+
+.page-warn .header-main {
+	background-image: var(--warn-gradient) !important;
+}
+
+.page-warn {
+	background-color: var(--bg);
+}
+
+.page-warn .page-content {
+	text-align: center;
+}
+
+.page-warn .page-content h3 {
+	font-size: 1.4rem;
+	margin-top: 20px;
+}
+
+.page-warn .page-content p {
+	font-size: 1.15rem !important;
+}
+
+.page-warn .button:nth-of-type(1) {
+	margin-top: 40px;
 }
