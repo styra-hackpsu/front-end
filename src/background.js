@@ -1,4 +1,19 @@
-let imageCapture, photoWidth;
+async function post(url, data) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const resData = await response.json();
+  return resData;
+}
+
+let imageCapture,
+  photoWidth,
+  apiUrl = "http://127.0.0.1:8000";
 
 let executeScript = async (fun) => {
   chrome.storage.local.get(["tabIdGlobal"], async ({ tabIdGlobal }) => {
@@ -44,6 +59,16 @@ let getAccess = async () => {
       reader.onloadend = function () {
         var base64data = reader.result;
         console.log(base64data);
+        post(`${apiUrl}/utils/detect/`, {
+          path: base64data,
+          choice: 1,
+        })
+          .then((res) => {
+            // if(res.) //if condition to check whether tired or not
+            chrome.runtime.sendMessage({ state: "tired" });
+            console.log(res);
+          })
+          .catch((err) => console.log(err.message));
       };
       return true;
     })

@@ -297,4 +297,17 @@ document.addEventListener("DOMContentLoaded", () => {
 	const setupPage = new SetupPage(() => {
 		mainPage.isOpen = true;
 	});
+	
+	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+		if (request.state) {
+			// open popup
+		}
+		if (request.state === "tired") {
+			// set screen to tired 
+		}
+		if (request.state === "distracted") {
+			// set screen to distracted
+		}
+	});
+
 });

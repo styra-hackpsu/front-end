@@ -24,3 +24,6 @@
 - Timer/ Clock for break timer
 - stop break now button
 - extend break for 5 minute (clickable max 2 times)
+
+tiredness -> emotion
+distraction -> context
