@@ -1,6 +1,8 @@
 # parcel cache
 .parcel-cache
 
+.DS_Store
+
 # Logs
 logs
 *.log
