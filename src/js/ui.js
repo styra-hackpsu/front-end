@@ -1,11 +1,17 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
+
+const clean = (html) => {
+	let doc = new DOMParser().parseFromString(html, "text/html");
+	return doc.body.textContent || "";
+};
+
 const userName = {
 	get() {
 		return window.localStorage.getItem("userName") ?? false;
 	},
 	set(name) {
-		window.localStorage.setItem("userName", name);
+		window.localStorage.setItem("userName", clean(name));
 		return name;
 	},
 };
@@ -94,7 +100,7 @@ class SetupPage extends Page {
 
 class Wave {
 	static resolution = 3;
-	static ghost = 3;
+	static ghost = 5;
 	static ghostSpace = 30;
 
 	ctx = null;
@@ -208,7 +214,7 @@ class Waves {
 				this.ctx,
 				{ a: 1.2, b: 1 / 250, c: 0, d: 4, e: 20 },
 				{ a: 0.6, b: 1 / 200, c: 0.5 },
-				Waves.colors[1],
+				Waves.colors[0],
 				3
 			)
 		);
@@ -218,7 +224,7 @@ class Waves {
 				this.ctx,
 				{ a: 1.4, b: 1 / 200, c: 7, d: 4, e: 30 },
 				{ a: 0.4, b: 1 / 300, c: 0.5 },
-				Waves.colors[0],
+				Waves.colors[1],
 				3
 			)
 		);
@@ -279,9 +285,7 @@ class MainPage extends Page {
 		return super.isOpen;
 	}
 
-	init() {
-		// Setup periodic API calls here!
-	}
+	init() {}
 
 	constructor() {
 		super("#page-main");
@@ -291,11 +295,23 @@ class MainPage extends Page {
 	}
 }
 
+class DistractPage extends Page {
+	heading = null;
+	constructor() {
+		super("#page-distract");
+		this.heading = $("#page-distract-heading");
+		this.heading.innerHTML = `Hey ${userName.get()}, seems like you're getting distracted<br />😳`;
+		this.isOpen = true;
+	}
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-	const mainPage = new MainPage();
+	// const mainPage = new MainPage();
+
+	const distractPage = new DistractPage();
 
 	const setupPage = new SetupPage(() => {
-		mainPage.isOpen = true;
+		distractPage.isOpen = true;
 	});
 	
 	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
