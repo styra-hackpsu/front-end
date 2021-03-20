@@ -1,0 +1,5 @@
+var _test = require("./test");
+require("../style/index.css");
+window.addEventListener("DOMContentLoaded", () => {
+  alert(`Testing build in parcel: ${_test.z}`);
+});

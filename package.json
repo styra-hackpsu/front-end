@@ -1,0 +1,17 @@
+{
+	"name": "front-end",
+	"version": "1.0.0",
+	"description": "Front end for HackPSU 21",
+	"main": "index.html",
+	"repository": "https://github.com/manage-me-hack/front-end",
+	"author": "Rohan Dhar <rohan19443@iiitd.ac.in>",
+	"license": "MIT",
+	"scripts": {
+		"start": "parcel serve ./src/index.html",
+		"build": "parcel build ./src/index.html"
+	},
+	"private": true,
+	"dependencies": {
+		"parcel": "^2.0.0-beta.2"
+	}
+}

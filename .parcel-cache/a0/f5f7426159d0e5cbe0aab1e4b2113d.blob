@@ -1,0 +1,1 @@
+{"mappings":"AAEAA,OAAOC,iBAAiB,oBAAoB,KAC3CC,MAAAA","sources":["./src/js/index.js"],"sourcesContent":["import { z } from \"./test\";\n\nwindow.addEventListener(\"DOMContentLoaded\", () => {\n\talert(`Testing build in parcel: ${z}`);\n});\n"],"names":["window","addEventListener","alert"],"version":3,"file":"index.HASH_REF_7e2d2507b48b9b2464ec4faabcf5a8b0.js.map"}

@@ -1,0 +1,4 @@
+var _test = require("./test");
+window.addEventListener("DOMContentLoaded", () => {
+  alert(`Testing build in parcel:  ${_test.z}`);
+});

@@ -1,0 +1,4 @@
+var _z = require("./z");
+window.addEventListener("DOMContentLoaded", () => {
+  alert(_z.z);
+});
