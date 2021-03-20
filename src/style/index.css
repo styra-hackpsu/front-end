@@ -6,16 +6,20 @@
 }
 
 :root {
-	font-size: 10pt;
-	--red: #ff4f67;
+	font-size: 12pt;
+	--red: #ff4f5e;
 
-	--theme: rgb(87, 147, 255);
+	--theme: #5793ff;
 
-	--blue: #527aff;
+	--blue: #5c5eff;
 	--green: #1bd6ae;
 	--dark-green: #09bb94;
 	--yellow: #ffd95c;
 	--dark-yellow: #ffbd2b;
+
+	--theme-gradient: linear-gradient(45deg, var(--red), var(--blue));
+
+	--dark-blue: rgb(21, 27, 63);
 
 	--bg: #fff;
 	--bg-dark: #f5f5f5;
@@ -28,6 +32,8 @@
 	--text-light-4: #d7dee9;
 
 	--font: Quicksand;
+
+	font-size: 1rem;
 }
 
 a {
@@ -38,5 +44,170 @@ a {
 body {
 	height: 600px;
 	width: 400px;
+	background-color: var(--dark-blue);
+}
+
+.page {
+	display: none;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: var(--bg-dark);
+	top: 0;
+	left: 0;
+	transform: translateY(200px);
+	opacity: 0;
+}
+
+.page-content {
+	width: 85%;
+	margin: 20px auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.page header {
+	width: 100%;
+	display: flex;
+	padding: 20px 0;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0px 1px 6px 2px rgb(0 0 0 / 10%);
+	background-color: var(--bg);
+}
+
+.header-main {
+	background-image: var(--theme-gradient);
+	color: var(--bg);
+}
+
+.header-logo {
+	height: 70px;
+	margin: 10px 0;
+}
+
+.header-name {
+	font-size: 1.6rem;
+	font-weight: 600;
+}
+
+.header-info {
+	font-size: 1.5rem;
+	font-weight: 400;
+}
+
+#page-setup-desc {
+	font-size: 1.25rem;
+	/* text-align: center; */
+	line-height: 26px;
+	color: var(--text-light-2);
+}
+
+#page-setup-desc b {
+	font-weight: 500;
+	color: var(--theme);
+}
+
+.input {
+	border: none;
+	border-radius: 10px;
+	background-color: var(--bg);
+	padding: 0 20px;
+	height: 40px;
+	font-size: 0.9rem;
+	width: 100%;
+	font-weight: 500;
+	outline: none;
+	box-shadow: 0px 0px 4px 1px rgba(0 0 0 / 8%);
+}
+
+.labeled-input {
+	margin-top: 20px;
+	font-size: 1rem;
+	color: var(--text-light-2);
+}
+
+.labeled-input .input {
+	margin-top: 6px;
+}
+
+.button {
+	display: block;
+	position: relative;
+	outline: none;
+	border: 2.5px solid var(--theme);
+	border-radius: 20px;
+	height: 40px;
+	padding: 0 20px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-size: 0.8rem;
+	color: var(--theme);
+	width: auto;
+	margin-top: 15px;
+	cursor: pointer;
+	overflow: hidden;
+	transition: color 0.2s, background-color 1s;
+	z-index: 1;
+}
+
+.button:hover {
+	color: var(--bg);
 	background-color: var(--theme);
+}
+
+.button::after,
+.button::before {
+	display: block;
+	position: absolute;
+	content: "";
+	height: 10px;
+	width: 10px;
+	border-radius: 50%;
+	top: 50%;
+	left: 25%;
+	transform: translate(-50%, -50%);
+	opacity: 0;
+	z-index: -1;
+	background-color: var(--theme);
+	transition: all 0.5s ease-out;
+}
+
+.button::after {
+	left: 75%;
+}
+
+.button:hover::after,
+.button:hover::before {
+	height: 91px;
+	width: 91px;
+	opacity: 1;
+}
+
+#page-main {
+	background-color: var(--bg);
+}
+
+#page-main-canvas {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+
+#page-main-heading {
+	font-size: 1.3rem;
+	margin-top: 50px;
+	text-align: center;
+}
+
+#page-main-text {
+	font-size: 1.1rem;
+	margin-top: 20px;
+	font-weight: 500;
+	color: var(--text-light-2);
+	text-align: center;
 }
