@@ -17,9 +17,54 @@
 
 		<link rel="stylesheet" href="./style/index.css" />
 
+		<script src="./lib/gsap.js"></script>
+
+		<script src="./js/popup.js"></script>
+		<script src="./js/ui.js"></script>
 		<title>Manage me</title>
 	</head>
 	<body>
-		<script src="./js/popup.js"></script>
+		<main class="page" id="page-setup">
+			<header class="header-main">
+				<img class="header-logo" src="./assets/logo.svg" alt="Logo" />
+				<h3 class="header-name">Styra</h3>
+			</header>
+			<header>
+				<h4 class="header-info">Let's setup Styra for you</h4>
+			</header>
+			<main class="page-content">
+				<p id="page-setup-desc">
+					<b>Styra</b> is smart <b>blabla</b> which enables you to
+					blabla and live a <b>better life</b> and do things that
+					<b>matter</b>. It knows what <b>you care about</b>, without
+					you having to tell it.
+				</p>
+				<label class="labeled-input">
+					Enter you name
+					<input
+						id="page-setup-name"
+						class="input"
+						type="text"
+						placeholder="John Cena"
+					/>
+				</label>
+				<button id="page-setup-done" class="button">Done</button>
+			</main>
+		</main>
+
+		<main class="page" id="page-main">
+			<header class="header-main">
+				<img class="header-logo" src="./assets/logo.svg" alt="Logo" />
+				<h3 class="header-name">Styra</h3>
+			</header>
+			<main class="page-content">
+				<h3 id="page-main-heading"></h3>
+				<p id="page-main-text">
+					You're going strong. We'll let you know when we feel
+					something's off!
+				</p>
+			</main>
+			<canvas id="page-main-canvas"></canvas>
+		</main>
 	</body>
 </html>
