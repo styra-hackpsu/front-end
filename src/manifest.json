@@ -16,7 +16,7 @@
 		"https://*.google.com/",
 		"http://*.google.com/"
 	  ],
-	"permissions": ["storage", "tabs", "activeTab", "scripting", "<all_urls>"],
+	"permissions": ["storage", "tabs","alarms", "activeTab", "scripting", "<all_urls>"],
 	"action": {
 		"default_popup": "popup.html"
 	}

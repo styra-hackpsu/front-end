@@ -1,33 +1,35 @@
-let imageCapture, photoWidth, tabIdGlobal;
+let imageCapture, photoWidth;
 
 let executeScript = async (fun) => {
-  if (!tabIdGlobal) {
-    chrome.tabs.create({
-      active: false,
-      url: "https://www.google.com/",
-      pinned: true,
-    });
-    chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
-      // make sure the status is 'complete' and it's the right tab
-      if (
-        tab.url.indexOf("https://www.google.com/") != -1 &&
-        changeInfo.status == "complete"
+  chrome.storage.local.get(["tabIdGlobal"], async ({ tabIdGlobal }) => {
+    if (!tabIdGlobal) {
+      const tab = await chrome.tabs.create({
+        active: false,
+        url: "https://www.google.com/",
+        pinned: true,
+      });
+      chrome.storage.local.set({ tabIdGlobal: tab.id });
+      // tabIdGlobal = tab.id;
+      chrome.tabs.onUpdated.addListener(async function (
+        tabId,
+        changeInfo,
+        tab
       ) {
-        tabIdGlobal = tabId;
-        await chrome.scripting.executeScript({
-          target: { tabId: tabId },
-          function: fun,
-        });
-      }
-    });
-  } else {
-    await chrome.scripting.executeScript({
-      target: { tabId: tabGlobalId },
-      function: fun,
-    });
-  }
-  // let [tab] = await chrome.tabs.que	ry({ active: true, currentWindow: true });
-  // await
+        if (tabId === tabIdGlobal && changeInfo.status == "complete") {
+          tabIdGlobal = tabId;
+          await chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            function: fun,
+          });
+        }
+      });
+    } else {
+      await chrome.scripting.executeScript({
+        target: { tabId: tabIdGlobal },
+        function: fun,
+      });
+    }
+  });
 };
 
 let getAccess = async () => {
@@ -42,16 +44,27 @@ let getAccess = async () => {
       reader.onloadend = function () {
         var base64data = reader.result;
         console.log(base64data);
-        chrome.tabs.remove([tabIdGlobal], () => {});
       };
       return true;
     })
     .catch((error) => console.log(error));
 };
 
-chrome.action.onClicked.addListener(function (activeTab) {
-  // setInterval(() => {
-  //   executeScript(getAccess);
-  // }, 1000);
+chrome.alarms.create({ periodInMinutes: 0.1 });
+chrome.alarms.onAlarm.addListener(() => {
   executeScript(getAccess);
 });
+
+// chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+//   console.log(
+//     sender.tab
+//       ? "from a content script:" + sender.tab.url
+//       : "from the extension"
+//   );
+//   if (request.start) {
+//     chrome.alarms.create({ periodInMinutes: 0.1 });
+//     chrome.alarms.onAlarm.addListener(() => {
+//       executeScript(getAccess);
+//     });
+//   }
+// });

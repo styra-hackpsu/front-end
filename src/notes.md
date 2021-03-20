@@ -6,9 +6,9 @@
 
 - Some text to denote distraction
 - like honey
-- button to return to main work
-- button to add new things to list of interest
-- snooze alerts for 15 min
+- button to return to main work --> Close current tab OR send another request to backend to get the most relevant tab and then switch to it according to its id
+- button to add new things to list of interest --> Simple post request to backend
+- snooze alerts for 15 min --> Need to see implementation
 
 ## Tired screen
 
