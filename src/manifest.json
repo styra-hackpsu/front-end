@@ -12,7 +12,7 @@
 			"js": ["content-script.js"]
 		}
 	],
-	"permissions": ["storage", "activeTab", "scripting"],
+	"permissions": ["storage","tabs", "activeTab", "scripting"],
 	"action": {
 		"default_popup": "popup.html"
 	}
