@@ -7,15 +7,25 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 let executeScript = async (fun) => {
-  // const tab = await chrome.tabs.create({
-  //   active: false,
-  //   url: "https://www.google.com",
-  // });
-  let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  await chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    function: fun,
+  chrome.tabs.create({
+    active: false,
+    url: "https://www.google.com/",
   });
+  chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    // make sure the status is 'complete' and it's the right tab
+    if (
+      tab.url.indexOf("https://www.google.com/") != -1 &&
+      changeInfo.status == "complete"
+    ) {
+      console.log(tab);
+      chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        function: fun,
+      });
+    }
+  });
+  // let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  // await
   // chrome.tabs.remove(tab.id);
 };
 
