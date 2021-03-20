@@ -28,10 +28,11 @@ async function post(url, data) {
 function sendURL() {
   const request = { url: window.location.href };
   //Change to reader mode
-  post("http://127.0.0.1:8000/utils/context/", { path: request.url })
+  post("http://127.0.0.1:8000/utils/change-detect/", { path: request.url })
     .then((res) => {
-      // check for distraction
-      chrome.runtime.sendMessage({ state: "distracted" });
+      if (res?.data?.change_detected) {
+        chrome.runtime.sendMessage({ state: "distracted" });
+      }
       console.log(res);
     })
     .catch((err) => console.log(err.message));

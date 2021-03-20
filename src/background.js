@@ -59,13 +59,14 @@ let getAccess = async () => {
       reader.onloadend = function () {
         var base64data = reader.result;
         console.log(base64data);
-        post(`${apiUrl}/utils/detect/`, {
+        post(`${apiUrl}/utils/face-detect/`, {
           path: base64data,
           choice: 1,
         })
           .then((res) => {
-            // if(res.) //if condition to check whether tired or not
-            chrome.runtime.sendMessage({ state: "tired" });
+            if (res?.data?.sadness) {
+              chrome.runtime.sendMessage({ state: "tired" });
+            }
             console.log(res);
           })
           .catch((err) => console.log(err.message));
