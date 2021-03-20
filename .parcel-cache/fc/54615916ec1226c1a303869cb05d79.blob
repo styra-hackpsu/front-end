@@ -1,4 +1,0 @@
-var _test = require("./test");
-window.addEventListener("DOMContentLoaded", () => {
-  alert(_test.z);
-});
