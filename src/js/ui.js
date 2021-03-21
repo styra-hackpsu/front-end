@@ -28,6 +28,14 @@ const chromeStore = {
 	},
 };
 
+const inTime = (store, key) => {
+	const till = Number(store[key]);
+	if (isNaN(till) || till === 0 || till - new Date() <= 0) {
+		return false;
+	}
+	return till - new Date();
+};
+
 class Page {
 	static duration = 0.55;
 	static ease = "back";
@@ -166,46 +174,106 @@ class BreakPage extends Page {
 	text = null;
 	mainBtn = null;
 	subBtn = null;
-	constructor() {
+	timer = null;
+
+	onDone = null;
+
+	updateUI(left) {
+		const mins = Math.floor(left / 1000);
+		const secs = Math.floor(left - (mins * 60000) / 1000);
+		this.time.innerHTML = `${mins}m ${secs}s`;
+	}
+
+	async handleClose() {
+		clearInterval(this.timer);
+		this.updateUI(new Date());
+		await chromeStore.set({ breakTill: "0" });
+		this.isOpen = false;
+		if (typeof this.onDone === "function") {
+			this.onDone();
+		}
+	}
+
+	get isOpen() {
+		return super.isOpen;
+	}
+
+	set isOpen(isOpen) {
+		super.isOpen = isOpen;
+		if (isOpen) {
+			this.setupTimer();
+		}
+	}
+
+	setupTimer() {
+		this.timer = setInterval(async () => {
+			const store = await chromeStore.getAll();
+			const till = inTime(store, "breakTill");
+			if (!till) {
+				this.handleClose();
+			} else {
+				this.updateUI(till);
+			}
+		}, 1000);
+	}
+
+	constructor(onDone) {
 		super("#page-break");
-
-		this.time = $("#page-emotion .page-content h2");
-		this.text = $("#page-emotion .page-content p");
-
-		this.mainBtn = $("#page-emotion .page-content .button-main");
-		this.subBtn = $("#page-emotion .page-content .button-subtle");
-		this.isOpen = true;
+		this.time = $("#page-break .page-content h2");
+		this.text = $("#page-break .page-content p");
+		this.mainBtn = $("#page-break .page-content .button-main");
+		this.subBtn = $("#page-break .page-content .button-subtle");
+		this.onDone = onDone;
 	}
 }
 
 class Orchestrator {
 	pages = {};
 
+	closeAll() {
+		Object.entries(this.pages).map(([, page]) => {
+			page.isOpen = false;
+		});
+	}
+
+	async openPage() {
+		const store = await chromeStore.getAll();
+		this.closeAll();
+		if (!userName.get()) {
+			pages.setup.isOpen = true;
+			return;
+		}
+
+		if (inTime(store, "breakTill")) {
+			this.pages.break.isOpen = true;
+			return;
+		}
+
+		if (store.pageMode === "distract") {
+			this.pages.distract.isOpen = true;
+			return;
+		}
+
+		if (store.pageMode === "tired") {
+			this.pages.emotion.isOpen = true;
+			return;
+		}
+
+		this.pages.main.isOpen = true;
+	}
+
 	async init() {
 		const { pages } = this;
 		pages.main = new MainPage();
-
-		const setupNext = () => {
-			pages.main.isOpen = true;
-		};
-		pages.setup = new SetupPage(setupNext);
+		pages.setup = new SetupPage(this.openPage);
 		pages.emotion = new EmotionPage();
 		pages.distract = new DistractPage();
-		pages.break = new BreakPage();
-
-		const store = await chromeStore.getAll();
-		if (!userName.get()) {
-			pages.setup.isOpen = true;
-		}
-
-		// if(!store.pageMode){
-		// 	if(inBreak(store)){
-
-		// 	}
-		// }
+		pages.break = new BreakPage(this.openPage);
+		this.openPage();
 	}
 
 	constructor() {
+		this.openPage = this.openPage.bind(this);
 		this.init = this.init.bind(this);
 		document.addEventListener("DOMContentLoaded", this.init);
 	}
