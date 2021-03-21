@@ -29,4 +29,17 @@ function sendURL() {
       console.log(err.message);
     });
 }
-sendURL();
+chrome.storage.local.get(
+  ["snoozeTill", "breakTill"],
+  ({ snoozeTill, breakTill }) => {
+    if (snoozeTill === 0 && breakTill === 0) {
+      sendURL();
+    }
+  }
+);
+
+/* // TODO :
+- navigation, 
+- ui for snooze, 
+- url checking before sending search history,
+*/
