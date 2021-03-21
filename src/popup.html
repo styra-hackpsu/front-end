@@ -7,10 +7,6 @@
 
 		<link rel="preconnect" href="https://fonts.gstatic.com" />
 		<link
-			href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
-			rel="stylesheet"
-		/>
-		<link
 			href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Quicksand:wght@300;400;500;600;700&display=swap"
 			rel="stylesheet"
 		/>
@@ -20,6 +16,7 @@
 
 		<script src="./lib/gsap.js"></script>
 
+		<script src="./js/waves.js"></script>
 		<script src="./js/popup.js"></script>
 		<script src="./js/ui.js"></script>
 		<title>Manage me</title>
@@ -74,12 +71,12 @@
 				<h3 class="header-name">Styra</h3>
 			</header>
 			<main class="page-content">
-				<h3 id="page-distract-heading"></h3>
-				<p id="page-main-text">
+				<h3></h3>
+				<p>
 					We noticed that you've been drifting off-track. Let us help
 					you get back on track ☺️. Want to resume working?
 				</p>
-				<button class="button button-emoji">
+				<button class="button button-emoji button-main">
 					You got me. Resume My work <span>😅</span>
 				</button>
 				<button class="button button-emoji button-subtle">
@@ -88,7 +85,7 @@
 			</main>
 		</main>
 
-		<main class="page" id="page-analysis">
+		<main class="page" id="page-analysis">			
 			<header class="header-main">
 				<button>
 					Back
@@ -100,7 +97,40 @@
 			</main>
 		</main>
 
-		<main class="page" id="page-analysis-time-period">
+		<main class="page page-warn" id="page-emotion">
+			<header class="header-main">
+				<img class="header-logo" src="./assets/logo.svg" alt="Logo" />
+				<h3 class="header-name">Styra</h3>
+			</header>
+			<main class="page-content">
+				<h3></h3>
+				<p></p>
+				<button class="button button-emoji button-main"></button>
+				<button class="button button-emoji button-subtle"></button>
+			</main>
+		</main>
+
+		<main class="page" id="page-break">
+			<header class="header-main">
+				<img class="header-logo" src="./assets/logo.svg" alt="Logo" />
+				<h3 class="header-name">Styra</h3>
+			</header>
+			<main class="page-content">
+				<h3>In a break 🧘</h3>
+				<h2>1m 20s</h2>
+
+				<p>
+					Take a few minutes and walk around your home. You deserve to
+					relax !
+				</p>
+
+				<button class="button button-emoji button-main">
+					Extend break by 5 minutes 😪
+				</button>
+				<button class="button button-emoji button-subtle">
+					Stop break and back to work 🏃‍♀️
+				</button>
+			</main>
 		</main>
 	</body>
 </html>
