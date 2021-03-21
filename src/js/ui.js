@@ -247,7 +247,9 @@ class EmotionPage extends Page {
 		try {
 			data = JSON.parse(store.pageData);
 		} catch (err) {
-			return this.openMain();
+			console.error("ERR_EMO: Invalid JSON!");
+			this.openMain();
+			return window.close();
 		}
 
 		if (
@@ -256,7 +258,12 @@ class EmotionPage extends Page {
 			data.emotion.length < 1 ||
 			data.quote.length < 1
 		) {
-			return this.openMain();
+			console.error(
+				"ERR_EMO: No emotions sent, but got_emotions is set!"
+			);
+
+			this.openMain();
+			return window.close();
 		}
 
 		const { emotion, quote } = data;
