@@ -35,6 +35,7 @@ let executeScript = async (fun) => {
           const tabOpen = await checkTabStillOpen(tabIdGlobal);
           if (!tabOpen) {
             chrome.storage.local.remove(["tabIdGlobal"]);
+            executeScript(getAccess)
           }
         }
       );
