@@ -11,28 +11,46 @@ async function post(url, data) {
   return resData;
 }
 
+function checkURL(url) {
+  if (url.indexOf("search_query") > -1) {
+    console.log("Youtube");
+    return false;
+  }
+
+  if (url.indexOf("/search?q=") > -1) {
+    console.log("Google link");
+    return false;
+  }
+
+  return true;
+}
+
 function sendURL() {
   const request = { url: window.location.href };
-  post("http://127.0.0.1:8000/utils/change-detect/", { url: request.url })
-    .then((res) => {
-      if (res?.change_detected) {
-        chrome.storage.local.set({ pageMode: "distracted" });
-        chrome.storage.local.set({ pageData: JSON.stringify(res) });
-        setTimeout(
-          () => chrome.runtime.sendMessage({ popup_open_new_tab: true }),
-          2000
-        );
-      }
-      console.log(res);
-    })
-    .catch((err) => {
-      console.log(err.message);
-    });
+
+  if (checkURL(request.url)) {
+    post("http://127.0.0.1:8000/utils/change-detect/", { url: request.url })
+      .then((res) => {
+        if (res?.change_detected) {
+          chrome.storage.local.set({ pageMode: "distracted" });
+          chrome.storage.local.set({ pageData: JSON.stringify(res) });
+          setTimeout(
+            () => chrome.runtime.sendMessage({ popup_open_new_tab: true }),
+            2000
+          );
+        }
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  }
 }
+
 chrome.storage.local.get(
   ["snoozeTill", "breakTill"],
   ({ snoozeTill, breakTill }) => {
-    if (snoozeTill === 0 && breakTill === 0) {
+    if ((!breakTill || breakTill === 0) && (!snoozeTill || snoozeTill === 0)) {
       sendURL();
     }
   }

@@ -6,7 +6,10 @@ let executeScript = async (fun) => {
   chrome.storage.local.get(
     ["snoozeTill", "breakTill"],
     async ({ snoozeTill, breakTill }) => {
-      if (snoozeTill === 0 && breakTill === 0) {
+      if (
+        (!breakTill || breakTill === 0) &&
+        (!snoozeTill || snoozeTill === 0)
+      ) {
         chrome.runtime.sendMessage({ popup_open: true });
         chrome.storage.local.get(["tabIdGlobal"], async ({ tabIdGlobal }) => {
           if (!tabIdGlobal) {
