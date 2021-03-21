@@ -300,7 +300,7 @@ class DistractPage extends Page {
 	constructor() {
 		super("#page-distract");
 		this.heading = $("#page-distract-heading");
-		this.heading.innerHTML = `Hey ${userName.get()}, seems like you're getting distracted<br />😳`;
+		this.heading.innerHTML = `Hey${ userName.get() ? (" " + userName.get()) : ""}, seems like you're getting distracted<br />😳`;
 		this.isOpen = true;
 	}
 }
@@ -419,21 +419,21 @@ class AnalysisFrontPage extends Page {
 			<div class="container ${i%2 ==0 ? 'left' : 'right'}">
 				<div class="content">
 					<h2>${date.toTimeString().slice(0,8)}</h2>
-					<strong><span>${top_3[i][0][1]}</span></strong> <img src="./assets/final_emoji/${top_3[i][0][0]}.gif" height ="64px"> 
-					<strong><span>${top_3[i][1][1]}</span></strong> <img src="./assets/final_emoji/${top_3[i][1][0]}.gif" height ="32px"> 
-					<strong><span>${top_3[i][2][1]}</span></strong> <img src="./assets/final_emoji/${top_3[i][2][0]}.gif" height ="32px"> 
-					<p> <strong >${i == top_3.length - 1 ? "" : ctx[i]} </strong> Context Switches </p>
+					<strong><span>${Number.parseFloat(top_3[i][0][1]).toFixed(2)}</span></strong> <img src="./assets/final_emoji/${top_3[i][0][0]}.gif" height ="64px"> 
+					<strong><span>${Number.parseFloat(top_3[i][1][1]).toFixed(2)}</span></strong> <img src="./assets/final_emoji/${top_3[i][1][0]}.gif" height ="32px"> 
+					<strong><span>${Number.parseFloat(top_3[i][2][1]).toFixed(2)}</span></strong> <img src="./assets/final_emoji/${top_3[i][2][0]}.gif" height ="32px"> 
+					<p> <strong >${i == top_3.length - 1 ? 0 : ctx[i]} </strong> Context Switches </p>
 				</div>
 			</div>
 			`
 		})
 		document.getElementById("timeline").innerHTML = innerH;
+		document.getElementById("timeline").style.marginBottom = "50px";
 	}
 	
 	async init_ () {
-		// this.analysis_data = await this.getData()
-		;
-		this.createTimeline(this.preprocessData(this.dummyData));
+		this.analysis_data = await this.getData();
+		this.createTimeline(this.preprocessData(this.analysis_data));
 		return 1
 	}
 	
@@ -443,28 +443,41 @@ class AnalysisFrontPage extends Page {
 	}
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-	const analysisFrontPage = new AnalysisFrontPage();
+// document.addEventListener("DOMContentLoaded", () => {
+// 	const analysisFrontPage = new AnalysisFrontPage();
 	
-	analysisFrontPage.init_();
-
-	// const distractPage = new DistractPage();
+// 	analysisFrontPage.init_();
 	
-	const setupPage = new SetupPage(() => {
-		// distractPage.isOpen = false;
-		analysisFrontPage.isOpen = true;
-	});
+// 	// const distractPage = new DistractPage();
 	
-	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-		if (request.state) {
-			// open popup
+// 	const setupPage = new SetupPage(() => {
+// 		// distractPage.isOpen = false;
+// 		analysisFrontPage.isOpen = true;
+// 	});
+	document.addEventListener("DOMContentLoaded", () => {
+	// const mainPage = new MainPage();
+	// pageMode -> distracted, tired, else(normal), analysis  
+	// pageData -> extra data
+	// chrome.storage.local.remove(["tabIdGlobal"]);
+	// chrome.storage.local.set({ tabIdGlobal: tab.id });
+	
+	chrome.storage.local.get(["pageMode"], ({ pageMode }) => {
+		if (pageMode === "distracted") {
+			const distractPage = new DistractPage();
+			
+			const setupPage = new SetupPage(() => {
+				distractPage.isOpen = true;
+			});
+		} else {
+			const analysisFrontPage = new AnalysisFrontPage();
+			analysisFrontPage.init_();
+			
+		
+			const mainPage = new MainPage();
+			const setupPage = new SetupPage(() => {
+				// mainPage.isOpen = true;
+				analysisFrontPage.isOpen = true;
+			});
 		}
-		if (request.state === "tired") {
-			// set screen to tired 
-		}
-		if (request.state === "distracted") {
-			// set screen to distracted
-		}
-	});
-
+	});	
 });

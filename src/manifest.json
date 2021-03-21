@@ -13,11 +13,8 @@
 		}
 	],
 	"host_permissions": [
-		"chrome-extension://*/background.html",
-		"https://*.google.com/",
-		"http://*.google.com/"
+		"https://styra-landing.netlify.app/"
 	  ],
-	"options_page" : "background.html",
 	"permissions": ["storage", "tabs","alarms", "activeTab", "scripting", "<all_urls>"],
 	"action": {
 		"default_popup": "popup.html"

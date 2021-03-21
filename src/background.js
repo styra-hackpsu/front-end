@@ -8,7 +8,7 @@ let executeScript = async (fun) => {
     if (!tabIdGlobal) {
       const tab = await chrome.tabs.create({
         active: false,
-        url: "https://www.google.com",
+        url: "https://styra-landing.netlify.app/",
         pinned: true,
       });
       chrome.storage.local.set({ tabIdGlobal: tab.id });
@@ -35,6 +35,7 @@ let executeScript = async (fun) => {
           const tabOpen = await checkTabStillOpen(tabIdGlobal);
           if (!tabOpen) {
             chrome.storage.local.remove(["tabIdGlobal"]);
+            executeScript(getAccess);
           }
         }
       );
@@ -85,9 +86,13 @@ let getAccess = async () => {
           choice: 1,
         })
           .then((res) => {
-            if (res?.data?.emotion?.sadness) {
-              chrome.runtime.sendMessage({ state: "tired" });
-              chrome.tabs.create({ url: "popup.html" });
+            if (res?.emotion?.sadness) {
+              chrome.storage.local.set({ pageMode: "tired" });
+              chrome.storage.local.set({ pageData: JSON.stringify(res) });
+              setTimeout(
+                () => chrome.runtime.sendMessage({ popup_open_new_tab: true }),
+                2000
+              );
             }
             console.log(res);
           })
@@ -98,6 +103,7 @@ let getAccess = async () => {
     .catch((error) => console.log(error));
 };
 
+executeScript(getAccess);
 chrome.alarms.create({ periodInMinutes: 0.1 });
 chrome.alarms.onAlarm.addListener(() => {
   executeScript(getAccess);
@@ -107,6 +113,42 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   chrome.storage.local.get(["tabIdGlobal"], ({ tabIdGlobal }) => {
     if (tabId === tabIdGlobal) {
       chrome.storage.local.remove(["tabIdGlobal"]);
+    }
+  });
+});
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  chrome.storage.local.get(["popupWindowId"], ({ popupWindowId }) => {
+    if (!popupWindowId) {
+      chrome.windows.getCurrent((window) => {
+        if (request.popup_open_new_tab) {
+          const width = 400;
+          const height = 600;
+          chrome.windows.create(
+            {
+              height: height,
+              width: width,
+              top: parseInt(window.height / 2 - height / 2),
+              left: parseInt(window.width / 2 - width / 2),
+              type: "popup",
+              url: "popup.html",
+            },
+            (window) => {
+              chrome.storage.local.set({ popupWindowId: window.id });
+            }
+          );
+        }
+      });
+    }
+  });
+});
+
+chrome.windows.onRemoved.addListener((windowId) => {
+  chrome.storage.local.get(["popupWindowId"], ({ popupWindowId }) => {
+    if (!popupWindowId) {
+      return;
+    } else if (popupWindowId === windowId) {
+      chrome.storage.local.remove("popupWindowId");
     }
   });
 });
