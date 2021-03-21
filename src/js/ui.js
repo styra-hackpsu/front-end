@@ -300,7 +300,7 @@ class DistractPage extends Page {
 	constructor() {
 		super("#page-distract");
 		this.heading = $("#page-distract-heading");
-		this.heading.innerHTML = `Hey ${userName.get()}, seems like you're getting distracted<br />😳`;
+		this.heading.innerHTML = `Hey${ userName.get() ? (" " + userName.get()) : ""}, seems like you're getting distracted<br />😳`;
 		this.isOpen = true;
 	}
 }
@@ -314,16 +314,18 @@ document.addEventListener("DOMContentLoaded", () => {
 		distractPage.isOpen = true;
 	});
 	
-	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-		if (request.state) {
-			// open popup
-		}
-		if (request.state === "tired") {
-			// set screen to tired 
-		}
-		if (request.state === "distracted") {
-			// set screen to distracted
-		}
-	});
+	
+});
 
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+	console.log(request) 
+	if (request.state) {
+		// open popup
+	}
+	if (request.state === "tired") {
+		// set screen to tired
+	}
+	if (request.state === "distracted") {
+		// set screen to distracted
+	}
 });

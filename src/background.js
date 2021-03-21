@@ -35,7 +35,7 @@ let executeScript = async (fun) => {
           const tabOpen = await checkTabStillOpen(tabIdGlobal);
           if (!tabOpen) {
             chrome.storage.local.remove(["tabIdGlobal"]);
-            executeScript(getAccess)
+            executeScript(getAccess);
           }
         }
       );
@@ -86,9 +86,14 @@ let getAccess = async () => {
           choice: 1,
         })
           .then((res) => {
-            if (res?.data?.emotion?.sadness) {
+            if (res?.emotion?.sadness) {
               chrome.runtime.sendMessage({ state: "tired" });
-              chrome.tabs.create({ url: "popup.html" });
+              chrome.runtime.sendMessage({ popup_open_new_tab: true });
+              // chrome.window.create({
+              //   height: "600px",
+              //   width: "400px",
+              //   url: "popup.html",
+              // });
             }
             console.log(res);
           })
@@ -110,4 +115,17 @@ chrome.tabs.onRemoved.addListener((tabId) => {
       chrome.storage.local.remove(["tabIdGlobal"]);
     }
   });
+});
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  // chrome.windows.getAll((windows) => windows[0]).width
+  if (request.popup_open_new_tab) {
+    chrome.windows.create({
+      height: 600,
+      width: 400,
+      // top: ,
+      type: "popup",
+      url: "popup.html",
+    });
+  }
 });
