@@ -16,10 +16,8 @@
 			"js": ["content-script.js"]
 		}
 	],
-	"host_permissions": [
-		"https://styra-landing.netlify.app/"
-	  ],
-	"permissions": ["storage", "tabs","alarms", "activeTab", "scripting"],
+	"host_permissions": ["https://styra-landing.netlify.app/"],
+	"permissions": ["storage", "tabs", "alarms", "activeTab", "scripting"],
 	"action": {
 		"default_popup": "popup.html"
 	}
