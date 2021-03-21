@@ -17,6 +17,7 @@ function sendURL() {
     .then((res) => {
       if (res?.change_detected) {
         chrome.storage.local.set({ pageMode: "distracted" });
+        chrome.storage.local.set({ pageData: JSON.stringify(res) });
         setTimeout(
           () => chrome.runtime.sendMessage({ popup_open_new_tab: true }),
           2000

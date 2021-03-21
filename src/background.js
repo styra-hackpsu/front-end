@@ -88,6 +88,7 @@ let getAccess = async () => {
           .then((res) => {
             if (res?.emotion?.sadness) {
               chrome.storage.local.set({ pageMode: "tired" });
+              chrome.storage.local.set({ pageData: JSON.stringify(res) });
               setTimeout(
                 () => chrome.runtime.sendMessage({ popup_open_new_tab: true }),
                 2000
@@ -151,4 +152,3 @@ chrome.windows.onRemoved.addListener((windowId) => {
     }
   });
 });
-// TODO : JSON.stringify() extra data
