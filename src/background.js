@@ -64,7 +64,7 @@ let getAccess = async () => {
           choice: 1,
         })
           .then((res) => {
-            if (res?.data?.sadness) {
+            if (res?.data?.emotion?.sadness) {
               chrome.runtime.sendMessage({ state: "tired" });
             }
             console.log(res);
