@@ -8,7 +8,7 @@ const inTime = (till) => {
 	}
 	return till - new Date().getTime();
 };
-	
+
 let executeScript = async (fun) => {
 	chrome.storage.local.get(
 		["snoozeTill", "breakTill"],
@@ -104,23 +104,21 @@ let getAccess = async () => {
 				};
 
 				var base64data = reader.result;
-				console.log(base64data);
 				post(`http://127.0.0.1:8000/utils/face-detect/`, {
 					path: base64data,
 					choice: 1,
 				})
 					.then((res) => {
 						if (res?.got_emotion) {
-							chrome.storage.local.set({ pageMode: "tired" });
-							chrome.storage.local.set({
-								pageData: JSON.stringify(res),
-							});
-							setTimeout(
+							chrome.storage.local.set(
+								{
+									pageMode: "tired",
+									pageData: JSON.stringify(res),
+								},
 								() =>
 									chrome.runtime.sendMessage({
 										popup_open_new_tab: true,
-									}),
-								2000
+									})
 							);
 						}
 						console.log(res);
@@ -153,6 +151,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 				if (request.popup_open_new_tab) {
 					const width = 400;
 					const height = 600;
+					console.log(`IN HERE!! OPENIGN!!`);
 					chrome.windows.create(
 						{
 							height: height,

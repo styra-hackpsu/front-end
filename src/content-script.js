@@ -32,14 +32,15 @@ function sendURL() {
 		post("http://127.0.0.1:8000/utils/change-detect/", { url: request.url })
 			.then((res) => {
 				if (res?.change_detected) {
-					chrome.storage.local.set({ pageMode: "distracted" });
-					chrome.storage.local.set({ pageData: JSON.stringify(res) });
-					setTimeout(
+					chrome.storage.local.set(
+						{
+							pageMode: "distracted",
+							pageData: JSON.stringify(res),
+						},
 						() =>
 							chrome.runtime.sendMessage({
 								popup_open_new_tab: true,
-							}),
-						2000
+							})
 					);
 				}
 				console.log(res);
