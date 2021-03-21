@@ -299,7 +299,7 @@ class Orchestrator {
 			return;
 		}
 
-		if (store.pageMode === "distract") {
+		if (store.pageMode === "distracted") {
 			this.pages.distract.isOpen = true;
 			return;
 		}
@@ -456,25 +456,34 @@ class AnalysisFrontPage extends Page {
 		let innerH = "";
 		data["user-emotions"].map((elem, i) => {
 			let date = new Date(elem.timestamp);
+			let date2 = null;
+			if (i == data["user-emotions"].length-1) 
+				date2 = date
+			else  {
+				date2 = new Date(data["user-emotions"][i+1].timestamp);
+			}
 			innerH += `
 			<div class="container ${i % 2 == 0 ? "left" : "right"}">
 				<div class="content">
-					<h2>${date.toTimeString().slice(0, 8)}</h2>
-					<strong><span>${Number.parseFloat(top_3[i][0][1]).toFixed(
-						2
-					)}</span></strong> <img src="./assets/final_emoji/${
-				top_3[i][0][0]
-			}.gif" height ="64px"> 
-					<strong><span>${Number.parseFloat(top_3[i][1][1]).toFixed(
-						2
-					)}</span></strong> <img src="./assets/final_emoji/${
-				top_3[i][1][0]
-			}.gif" height ="32px"> 
-					<strong><span>${Number.parseFloat(top_3[i][2][1]).toFixed(
-						2
-					)}</span></strong> <img src="./assets/final_emoji/${
-				top_3[i][2][0]
-			}.gif" height ="32px"> 
+					<h2>${date.toTimeString().slice(0, 8)} -  ${date2.toTimeString().slice(0, 8)}</h2>
+					<table>
+					<thead>
+						<tr>
+							<th><img src="./assets/final_emoji/${ top_3[i][0][0] }.gif" height ="64px"> </th>
+							<th><img src="./assets/final_emoji/${ top_3[i][1][0] }.gif" height ="32px"> </th>
+							<th><img src="./assets/final_emoji/${ top_3[i][2][0] }.gif" height ="32px"> </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr style="text-align: center">
+							<td ><span>${Number.parseFloat(top_3[i][0][1]).toFixed(2)}</span></td>
+							<td><span>${Number.parseFloat(top_3[i][1][1]).toFixed(2)}</span></td>
+							<td><span>${Number.parseFloat(top_3[i][2][1]).toFixed(2)}</span></td>
+				
+						</tr>
+					</tbody>
+				
+				</table>
 					<p> <strong >${
 						i == top_3.length - 1 ? 0 : ctx[i]
 					} </strong> Context Switches </p>
