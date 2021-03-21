@@ -336,13 +336,6 @@ class AnalysisFrontPage extends Page {
 		return super.isOpen;
 	}
 
-	set isOpen(isOpen) {
-		super.isOpen = isOpen;
-		if (isOpen) {
-			this.init_();
-		}
-	}
-
 	preprocessData(data) {
 		//emotions
 		let emotions = data["user-emotions"];
@@ -422,7 +415,7 @@ class AnalysisFrontPage extends Page {
 		document.getElementById("timeline").style.marginBottom = "50px";
 	}
 
-	async init_() {
+	async setup() {
 		this.analysis_data = await this.getData();
 		this.createTimeline(this.preprocessData(this.analysis_data));
 		return 1;
@@ -430,14 +423,13 @@ class AnalysisFrontPage extends Page {
 
 	constructor() {
 		super("#page-analysis");
-		this.isOpen = true;
 	}
 }
 
 // document.addEventListener("DOMContentLoaded", () => {
 // 	const analysisFrontPage = new AnalysisFrontPage();
 
-// 	analysisFrontPage.init_();
+// 	analysisFrontPage.setup();
 
 // 	// const distractPage = new DistractPage();
 
@@ -461,7 +453,7 @@ class AnalysisFrontPage extends Page {
 // 			});
 // 		} else {
 // 			const analysisFrontPage = new AnalysisFrontPage();
-// 			analysisFrontPage.init_();
+// 			analysisFrontPage.setup();
 
 // 			const mainPage = new MainPage();
 // 			const setupPage = new SetupPage(() => {
