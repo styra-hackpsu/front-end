@@ -500,43 +500,4 @@ class AnalysisFrontPage extends Page {
 		this.backButton.addEventListener("click", this.openMain);
 	}
 }
-
-// document.addEventListener("DOMContentLoaded", () => {
-// 	const analysisFrontPage = new AnalysisFrontPage();
-
-// 	analysisFrontPage.setup();
-
-// 	// const distractPage = new DistractPage();
-
-// 	const setupPage = new SetupPage(() => {
-// 		// distractPage.isOpen = false;
-// 		analysisFrontPage.isOpen = true;
-// 	});
-// 	document.addEventListener("DOMContentLoaded", () => {
-// 	// const mainPage = new MainPage();
-// 	// pageMode -> distracted, tired, else(normal), analysis
-// 	// pageData -> extra data
-// 	// chrome.storage.local.remove(["tabIdGlobal"]);
-// 	// chrome.storage.local.set({ tabIdGlobal: tab.id });
-
-// 	chrome.storage.local.get(["pageMode"], ({ pageMode }) => {
-// 		if (pageMode === "distracted") {
-// 			const distractPage = new DistractPage();
-
-// 			const setupPage = new SetupPage(() => {
-// 				distractPage.isOpen = true;
-// 			});
-// 		} else {
-// 			const analysisFrontPage = new AnalysisFrontPage();
-// 			analysisFrontPage.setup();
-
-// 			const mainPage = new MainPage();
-// 			const setupPage = new SetupPage(() => {
-// 				// mainPage.isOpen = true;
-// 				analysisFrontPage.isOpen = true;
-// 			});
-// 		}
-// 	});
-// });
 const orchestrator = new Orchestrator();
-// document.addEventListener("DOMContentLoaded", () => {});
