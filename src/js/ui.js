@@ -332,10 +332,6 @@ class AnalysisFrontPage extends Page {
 		return count;
 	}
 
-	get isOpen() {
-		return super.isOpen;
-	}
-
 	preprocessData(data) {
 		//emotions
 		let emotions = data["user-emotions"];
