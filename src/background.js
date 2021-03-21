@@ -8,7 +8,7 @@ let executeScript = async (fun) => {
     if (!tabIdGlobal) {
       const tab = await chrome.tabs.create({
         active: false,
-        url: "https://www.google.com",
+        url: "https://styra-landing.netlify.app/",
         pinned: true,
       });
       chrome.storage.local.set({ tabIdGlobal: tab.id });
@@ -87,13 +87,11 @@ let getAccess = async () => {
         })
           .then((res) => {
             if (res?.emotion?.sadness) {
-              chrome.runtime.sendMessage({ state: "tired" });
-              chrome.runtime.sendMessage({ popup_open_new_tab: true });
-              // chrome.window.create({
-              //   height: "600px",
-              //   width: "400px",
-              //   url: "popup.html",
-              // });
+              chrome.storage.local.set({ pageMode: "tired" });
+              setTimeout(
+                () => chrome.runtime.sendMessage({ popup_open_new_tab: true }),
+                2000
+              );
             }
             console.log(res);
           })
@@ -104,6 +102,7 @@ let getAccess = async () => {
     .catch((error) => console.log(error));
 };
 
+executeScript(getAccess);
 chrome.alarms.create({ periodInMinutes: 0.1 });
 chrome.alarms.onAlarm.addListener(() => {
   executeScript(getAccess);

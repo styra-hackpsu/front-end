@@ -20,6 +20,7 @@
 
 	--theme-gradient: linear-gradient(45deg, var(--red), var(--theme));
 	--warn-gradient: linear-gradient(45deg, var(--red), var(--dark-yellow));
+	--calm-gradient: linear-gradient(45deg, var(--green), var(--theme));
 
 	--dark-blue: rgb(21, 27, 63);
 
@@ -47,6 +48,7 @@ body {
 	height: 600px;
 	width: 400px;
 	background-color: var(--dark-blue);
+	overflow: hidden;
 }
 
 .page {
@@ -261,4 +263,47 @@ body {
 
 .page-warn .button:nth-of-type(1) {
 	margin-top: 40px;
+}
+
+#page-break {
+	background-image: var(--calm-gradient);
+}
+
+#page-break .header-main {
+	margin-top: 20px;
+	background-image: none !important;
+	box-shadow: none;
+	background-color: transparent;
+}
+
+#page-break .page-content {
+	width: 95%;
+	background-color: var(--bg);
+	padding: 35px;
+	border-radius: 20px;
+	height: 100%;
+}
+
+#page-break .page-content h3 {
+	font-size: 1.3rem;
+	color: var(--text-light);
+}
+
+#page-break .page-content h2 {
+	font-weight: 100;
+	font-size: 4rem;
+	margin: 20px 0;
+	color: var(--text);
+}
+
+#page-break .page-content h2 b {
+	font-weight: 500;
+}
+
+#page-break .page-content p {
+	font-weight: 400;
+	font-size: 1.1rem;
+	font-weight: 500;
+	color: var(--text-light);
+	margin-bottom: 20px;
 }

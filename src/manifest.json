@@ -13,8 +13,7 @@
 		}
 	],
 	"host_permissions": [
-		"https://*.google.com/",
-		"http://*.google.com/"
+		"https://styra-landing.netlify.app/"
 	  ],
 	"permissions": ["storage", "tabs","alarms", "activeTab", "scripting", "<all_urls>"],
 	"action": {

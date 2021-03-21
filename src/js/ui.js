@@ -16,6 +16,18 @@ const userName = {
 	},
 };
 
+const chromeStore = {
+	getAll() {
+		return new Promise((res) => chrome.storage.local.get(null, res));
+	},
+	set(vals) {
+		return new Promise((res) => chrome.storage.local.set(vals, res));
+	},
+	remove(keys) {
+		return new Promise((res) => chrome.storage.local.remove(keys, res));
+	},
+};
+
 class Page {
 	static duration = 0.55;
 	static ease = "back";
@@ -91,10 +103,6 @@ class SetupPage extends Page {
 	constructor(next) {
 		super("#page-setup");
 		this.next = next;
-
-		if (!userName.get()) {
-			this.isOpen = true;
-		}
 	}
 }
 
@@ -124,7 +132,6 @@ class MainPage extends Page {
 		super("#page-main");
 		this.heading = $("#page-main-heading");
 		this.waves = new window.Waves();
-		this.isOpen = !!userName.get();
 	}
 }
 
@@ -136,7 +143,6 @@ class DistractPage extends Page {
 		this.heading.innerHTML = `Hey${
 			userName.get() ? " " + userName.get() : ""
 		}, seems like you're getting distracted<br />😳`;
-		this.isOpen = true;
 	}
 }
 
@@ -152,33 +158,58 @@ class EmotionPage extends Page {
 		this.text = $("#page-emotion .page-content p");
 		this.mainBtn = $("#page-emotion .page-content .button-main");
 		this.subBtn = $("#page-emotion .page-content .button-subtle");
+	}
+}
 
-		this.heading.innerHTML = `Hey${
-			userName.get() ? " " + userName.get() : ""
-		}, seems like you're getting distracted<br />😳`;
+class BreakPage extends Page {
+	time = null;
+	text = null;
+	mainBtn = null;
+	subBtn = null;
+	constructor() {
+		super("#page-break");
+
+		this.time = $("#page-emotion .page-content h2");
+		this.text = $("#page-emotion .page-content p");
+
+		this.mainBtn = $("#page-emotion .page-content .button-main");
+		this.subBtn = $("#page-emotion .page-content .button-subtle");
 		this.isOpen = true;
 	}
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-	// const mainPage = new MainPage();
+class Orchestrator {
+	pages = {};
 
-	const distractPage = new DistractPage();
+	async init() {
+		const { pages } = this;
+		pages.main = new MainPage();
 
-	const setupPage = new SetupPage(() => {
-		distractPage.isOpen = true;
-	});
-});
+		const setupNext = () => {
+			pages.main.isOpen = true;
+		};
+		pages.setup = new SetupPage(setupNext);
+		pages.emotion = new EmotionPage();
+		pages.distract = new DistractPage();
+		pages.break = new BreakPage();
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-	console.log(request);
-	if (request.state) {
-		// open popup
+		const store = await chromeStore.getAll();
+		if (!userName.get()) {
+			pages.setup.isOpen = true;
+		}
+
+		// if(!store.pageMode){
+		// 	if(inBreak(store)){
+
+		// 	}
+		// }
 	}
-	if (request.state === "tired") {
-		// set screen to tired
+
+	constructor() {
+		this.init = this.init.bind(this);
+		document.addEventListener("DOMContentLoaded", this.init);
 	}
-	if (request.state === "distracted") {
-		// set screen to distracted
-	}
-});
+}
+
+const orchestrator = new Orchestrator();
+// document.addEventListener("DOMContentLoaded", () => {});
