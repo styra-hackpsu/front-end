@@ -50,13 +50,17 @@ function sendURL() {
 	}
 }
 
+const inTime = (till) => {
+	if (isNaN(till) || till === 0 || till - new Date() <= 0) {
+		return false;
+	}
+	return till - new Date().getTime();
+};
+
 chrome.storage.local.get(
 	["snoozeTill", "breakTill"],
 	({ snoozeTill, breakTill }) => {
-		if (
-			(!breakTill || Number(breakTill) === 0) &&
-			(!snoozeTill || Number(snoozeTill) === 0)
-		) {
+		if (!inTime(snoozeTill) && !inTime(breakTill)) {
 			sendURL();
 		}
 	}
