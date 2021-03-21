@@ -52,6 +52,10 @@ function sendURL() {
 }
 
 const inTime = (till) => {
+	if (till === -1) {
+		return true;
+	}
+
 	if (isNaN(till) || till === 0 || till - new Date() <= 0) {
 		return false;
 	}
@@ -61,7 +65,7 @@ const inTime = (till) => {
 chrome.storage.local.get(
 	["snoozeTill", "breakTill"],
 	({ snoozeTill, breakTill }) => {
-		if (!inTime(snoozeTill) && !inTime(breakTill)) {
+		if (!inTime(Number(snoozeTill)) && !inTime(Number(breakTill))) {
 			sendURL();
 		}
 	}

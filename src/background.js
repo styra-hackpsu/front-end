@@ -3,6 +3,9 @@ let imageCapture,
 	apiUrl = "http://127.0.0.1:8000";
 
 const inTime = (till) => {
+	if (till === -1) {
+		return true;
+	}
 	if (isNaN(till) || till === 0 || till - new Date() <= 0) {
 		return false;
 	}
@@ -13,7 +16,7 @@ let executeScript = async (fun) => {
 	chrome.storage.local.get(
 		["snoozeTill", "breakTill"],
 		async ({ snoozeTill, breakTill }) => {
-			if (!inTime(snoozeTill) && !inTime(breakTill)) {
+			if (!inTime(Number(snoozeTill)) && !inTime(Number(breakTill))) {
 				chrome.runtime.sendMessage({ popup_open: true });
 				chrome.storage.local.get(
 					["tabIdGlobal"],
