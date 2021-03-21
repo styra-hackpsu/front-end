@@ -51,6 +51,9 @@ class Page {
 		}
 		this._isOpen = isOpen;
 		if (isOpen) {
+			if (typeof this.setup === "function") {
+				this.setup();
+			}
 			this.open();
 		} else {
 			this.close();
@@ -117,21 +120,13 @@ class SetupPage extends Page {
 class MainPage extends Page {
 	waves = null;
 	heading = null;
-	set isOpen(isOpen) {
-		super.isOpen = isOpen;
-		if (this.isOpen) {
-			this.heading.innerHTML = `Keep crushing it,<br />${userName.get()} 💪`;
-			this.waves.start();
-			setTimeout(() => {
-				this.waves.setDims();
-			}, Page.duration);
-		} else {
-			this.waves.stop();
-		}
-	}
 
-	get isOpen() {
-		return super.isOpen;
+	setup() {
+		this.heading.innerHTML = `Keep crushing it,<br />${userName.get()} 💪`;
+		this.waves.start();
+		setTimeout(() => {
+			this.waves.setDims();
+		}, Page.duration);
 	}
 
 	init() {}
@@ -194,18 +189,7 @@ class BreakPage extends Page {
 		}
 	}
 
-	get isOpen() {
-		return super.isOpen;
-	}
-
-	set isOpen(isOpen) {
-		super.isOpen = isOpen;
-		if (isOpen) {
-			this.setupTimer();
-		}
-	}
-
-	setupTimer() {
+	setup() {
 		this.timer = setInterval(async () => {
 			const store = await chromeStore.getAll();
 			const till = inTime(store, "breakTill");
@@ -291,62 +275,61 @@ class AnalysisFrontPage extends Page {
 	dummyData = {
 		"user-keywords": [
 			{
-				"timestamp": "2021-03-23 23:32:46.401451+00:00",
+				timestamp: "2021-03-23 23:32:46.401451+00:00",
 				"context-switch": true,
-				"url": ""
+				url: "",
 			},
 		],
 		"user-emotions": [
 			{
-				"timestamp": "2021-03-20 23:32:16.401451+00:00",
+				timestamp: "2021-03-20 23:32:16.401451+00:00",
 				"simple-emotions": {
-					"additional_properties": {},
-					"anger": 0.0,
-					"contempt": 0.0,
-					"disgust": 0.0,
-					"fear": 0.0,
-					"happiness": 1.0,
-					"neutral": 0.0,
-					"sadness": 0.0,
-					"surprise": 0.0
+					additional_properties: {},
+					anger: 0.0,
+					contempt: 0.0,
+					disgust: 0.0,
+					fear: 0.0,
+					happiness: 1.0,
+					neutral: 0.0,
+					sadness: 0.0,
+					surprise: 0.0,
 				},
 				"complex-emotions": {
-					'non_vigilant':0.9 ,
-					'tired':0.1,
-					'alert':0
-				}
+					non_vigilant: 0.9,
+					tired: 0.1,
+					alert: 0,
+				},
 			},
 			{
-				"timestamp": "2021-03-29 23:32:26.401451+00:00",
+				timestamp: "2021-03-29 23:32:26.401451+00:00",
 				"simple-emotions": {
-					"additional_properties": {},
-					"anger": 0.0,
-					"contempt": 0.0,
-					"disgust": 0.0,
-					"fear": 0.0,
-					"happiness": 1.0,
-					"neutral": 0.0,
-					"sadness": 0.0,
-					"surprise": 0.0
+					additional_properties: {},
+					anger: 0.0,
+					contempt: 0.0,
+					disgust: 0.0,
+					fear: 0.0,
+					happiness: 1.0,
+					neutral: 0.0,
+					sadness: 0.0,
+					surprise: 0.0,
 				},
 				"complex-emotions": {
-					'non_vigilant':0.9 ,
-					'tired':0.1,
-					'alert':0
-				}
-			}
-		]
+					non_vigilant: 0.9,
+					tired: 0.1,
+					alert: 0,
+				},
+			},
+		],
 	};
 
-
-	checkBetweenTimeRanges (ctxs, tim1 , tim2) {
-		let count = 0
+	checkBetweenTimeRanges(ctxs, tim1, tim2) {
+		let count = 0;
 		ctxs.forEach((elem, i) => {
-			let time = parseInt(Date.parse( elem.timestamp));
-			let x  = (time > tim2 ) && ( time <= tim1 )
-			count += x ? 1 : 0
-		})
-		return count
+			let time = parseInt(Date.parse(elem.timestamp));
+			let x = time > tim2 && time <= tim1;
+			count += x ? 1 : 0;
+		});
+		return count;
 	}
 
 	get isOpen() {
@@ -360,74 +343,91 @@ class AnalysisFrontPage extends Page {
 		}
 	}
 
-	preprocessData (data) {
-		
+	preprocessData(data) {
 		//emotions
-		let emotions = data["user-emotions"]
+		let emotions = data["user-emotions"];
 
 		emotions = emotions.sort((first, second) => {
 			return Date.parse(second.timestamp) - Date.parse(first.timestamp);
-		});	
+		});
 
-		let top_3 = emotions.map ((elem) => {
-			let  dict =  { ...elem["complex-emotions"] , ...elem["simple-emotions"] } 
-			var items = Object.keys(dict).map(function(key) {
+		let top_3 = emotions.map((elem) => {
+			let dict = {
+				...elem["complex-emotions"],
+				...elem["simple-emotions"],
+			};
+			var items = Object.keys(dict).map(function (key) {
 				return [key, dict[key]];
-			  });
-				items.sort(function(first, second) {
+			});
+			items.sort(function (first, second) {
 				return second[1] - first[1];
-			  });
-			
-			
-			return (items.slice(0, 3));
+			});
+
+			return items.slice(0, 3);
 		});
 		// keywords
-		let n = emotions.length
+		let n = emotions.length;
 
-		let ctxChangedTimestamps = data["user-keywords"]
-		let ctx = []
-		for (let i = 0; i< n-1 ;i ++) {
+		let ctxChangedTimestamps = data["user-keywords"];
+		let ctx = [];
+		for (let i = 0; i < n - 1; i++) {
 			let tim1 = parseInt(Date.parse(emotions[i].timestamp));
-			let tim2 = parseInt(Date.parse(emotions[i+1].timestamp));
-			ctx.push(this.checkBetweenTimeRanges(ctxChangedTimestamps, tim1,tim2));
+			let tim2 = parseInt(Date.parse(emotions[i + 1].timestamp));
+			ctx.push(
+				this.checkBetweenTimeRanges(ctxChangedTimestamps, tim1, tim2)
+			);
 		}
 
-		return [top_3, data, ctx]
+		return [top_3, data, ctx];
 	}
 
-	async getData () {
-		let url = "http://127.0.0.1:8000/utils/analysis"  			//TODO
+	async getData() {
+		let url = "http://127.0.0.1:8000/utils/analysis"; //TODO
 		let response = await fetch(url);
 		let resData = await response.json();
 		return resData;
 	}
 
-	createTimeline ([top_3, data, ctx]) {
+	createTimeline([top_3, data, ctx]) {
 		let innerH = "";
-		data['user-emotions'].map((elem, i) => {
-			let date = new Date(elem.timestamp)
-			innerH +=  `
-			<div class="container ${i%2 ==0 ? 'left' : 'right'}">
+		data["user-emotions"].map((elem, i) => {
+			let date = new Date(elem.timestamp);
+			innerH += `
+			<div class="container ${i % 2 == 0 ? "left" : "right"}">
 				<div class="content">
-					<h2>${date.toTimeString().slice(0,8)}</h2>
-					<strong><span>${Number.parseFloat(top_3[i][0][1]).toFixed(2)}</span></strong> <img src="./assets/final_emoji/${top_3[i][0][0]}.gif" height ="64px"> 
-					<strong><span>${Number.parseFloat(top_3[i][1][1]).toFixed(2)}</span></strong> <img src="./assets/final_emoji/${top_3[i][1][0]}.gif" height ="32px"> 
-					<strong><span>${Number.parseFloat(top_3[i][2][1]).toFixed(2)}</span></strong> <img src="./assets/final_emoji/${top_3[i][2][0]}.gif" height ="32px"> 
-					<p> <strong >${i == top_3.length - 1 ? 0 : ctx[i]} </strong> Context Switches </p>
+					<h2>${date.toTimeString().slice(0, 8)}</h2>
+					<strong><span>${Number.parseFloat(top_3[i][0][1]).toFixed(
+						2
+					)}</span></strong> <img src="./assets/final_emoji/${
+				top_3[i][0][0]
+			}.gif" height ="64px"> 
+					<strong><span>${Number.parseFloat(top_3[i][1][1]).toFixed(
+						2
+					)}</span></strong> <img src="./assets/final_emoji/${
+				top_3[i][1][0]
+			}.gif" height ="32px"> 
+					<strong><span>${Number.parseFloat(top_3[i][2][1]).toFixed(
+						2
+					)}</span></strong> <img src="./assets/final_emoji/${
+				top_3[i][2][0]
+			}.gif" height ="32px"> 
+					<p> <strong >${
+						i == top_3.length - 1 ? 0 : ctx[i]
+					} </strong> Context Switches </p>
 				</div>
 			</div>
-			`
-		})
+			`;
+		});
 		document.getElementById("timeline").innerHTML = innerH;
 		document.getElementById("timeline").style.marginBottom = "50px";
 	}
-	
-	async init_ () {
+
+	async init_() {
 		this.analysis_data = await this.getData();
 		this.createTimeline(this.preprocessData(this.analysis_data));
-		return 1
+		return 1;
 	}
-	
+
 	constructor() {
 		super("#page-analysis");
 		this.isOpen = true;
@@ -436,41 +436,40 @@ class AnalysisFrontPage extends Page {
 
 // document.addEventListener("DOMContentLoaded", () => {
 // 	const analysisFrontPage = new AnalysisFrontPage();
-	
+
 // 	analysisFrontPage.init_();
-	
+
 // 	// const distractPage = new DistractPage();
-	
+
 // 	const setupPage = new SetupPage(() => {
 // 		// distractPage.isOpen = false;
 // 		analysisFrontPage.isOpen = true;
 // 	});
 // 	document.addEventListener("DOMContentLoaded", () => {
 // 	// const mainPage = new MainPage();
-// 	// pageMode -> distracted, tired, else(normal), analysis  
+// 	// pageMode -> distracted, tired, else(normal), analysis
 // 	// pageData -> extra data
 // 	// chrome.storage.local.remove(["tabIdGlobal"]);
 // 	// chrome.storage.local.set({ tabIdGlobal: tab.id });
-	
+
 // 	chrome.storage.local.get(["pageMode"], ({ pageMode }) => {
 // 		if (pageMode === "distracted") {
 // 			const distractPage = new DistractPage();
-			
+
 // 			const setupPage = new SetupPage(() => {
 // 				distractPage.isOpen = true;
 // 			});
 // 		} else {
 // 			const analysisFrontPage = new AnalysisFrontPage();
 // 			analysisFrontPage.init_();
-			
-		
+
 // 			const mainPage = new MainPage();
 // 			const setupPage = new SetupPage(() => {
 // 				// mainPage.isOpen = true;
 // 				analysisFrontPage.isOpen = true;
 // 			});
 // 		}
-// 	});	
+// 	});
 // });
 const orchestrator = new Orchestrator();
 // document.addEventListener("DOMContentLoaded", () => {});
