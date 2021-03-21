@@ -299,7 +299,7 @@ class Orchestrator {
 			return;
 		}
 
-		if (store.pageMode === "distract") {
+		if (store.pageMode === "distracted") {
 			this.pages.distract.isOpen = true;
 			return;
 		}
