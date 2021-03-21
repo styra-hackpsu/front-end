@@ -3,44 +3,64 @@ let imageCapture,
 	apiUrl = "http://127.0.0.1:8000";
 
 let executeScript = async (fun) => {
-	chrome.runtime.sendMessage({ popup_open: true });
-	chrome.storage.local.get(["tabIdGlobal"], async ({ tabIdGlobal }) => {
-		if (!tabIdGlobal) {
-			const tab = await chrome.tabs.create({
-				active: false,
-				url: "https://styra-landing.netlify.app/",
-				pinned: true,
-			});
-			chrome.storage.local.set({ tabIdGlobal: tab.id });
-			chrome.tabs.onUpdated.addListener(async function (
-				tabId,
-				changeInfo,
-				tab
+	chrome.storage.local.get(
+		["snoozeTill", "breakTill"],
+		async ({ snoozeTill, breakTill }) => {
+			if (
+				(!breakTill || breakTill === 0) &&
+				(!snoozeTill || snoozeTill === 0)
 			) {
-				if (tabId === tabIdGlobal && changeInfo.status == "complete") {
-					tabIdGlobal = tabId;
-					await chrome.scripting.executeScript({
-						target: { tabId: tabId },
-						function: fun,
-					});
-				}
-			});
-		} else {
-			await chrome.scripting.executeScript(
-				{
-					target: { tabId: tabIdGlobal },
-					function: fun,
-				},
-				async () => {
-					const tabOpen = await checkTabStillOpen(tabIdGlobal);
-					if (!tabOpen) {
-						chrome.storage.local.remove(["tabIdGlobal"]);
-						executeScript(getAccess);
+				chrome.runtime.sendMessage({ popup_open: true });
+				chrome.storage.local.get(
+					["tabIdGlobal"],
+					async ({ tabIdGlobal }) => {
+						if (!tabIdGlobal) {
+							const tab = await chrome.tabs.create({
+								active: false,
+								url: "https://styra-landing.netlify.app/",
+								pinned: true,
+							});
+							chrome.storage.local.set({ tabIdGlobal: tab.id });
+							chrome.tabs.onUpdated.addListener(async function (
+								tabId,
+								changeInfo,
+								tab
+							) {
+								if (
+									tabId === tabIdGlobal &&
+									changeInfo.status == "complete"
+								) {
+									tabIdGlobal = tabId;
+									await chrome.scripting.executeScript({
+										target: { tabId: tabId },
+										function: fun,
+									});
+								}
+							});
+						} else {
+							await chrome.scripting.executeScript(
+								{
+									target: { tabId: tabIdGlobal },
+									function: fun,
+								},
+								async () => {
+									const tabOpen = await checkTabStillOpen(
+										tabIdGlobal
+									);
+									if (!tabOpen) {
+										chrome.storage.local.remove([
+											"tabIdGlobal",
+										]);
+										executeScript(getAccess);
+									}
+								}
+							);
+						}
 					}
-				}
-			);
+				);
+			}
 		}
-	});
+	);
 };
 
 async function checkTabStillOpen(pinnedTabId) {
@@ -86,7 +106,7 @@ let getAccess = async () => {
 					choice: 1,
 				})
 					.then((res) => {
-						if (res?.emotion?.sadness) {
+						if (res?.got_emotion) {
 							chrome.storage.local.set({ pageMode: "tired" });
 							chrome.storage.local.set({
 								pageData: JSON.stringify(res),
