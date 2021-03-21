@@ -412,21 +412,6 @@ class Orchestrator {
 		pages.break = new BreakPage(this.openPage);
 		pages.analysis = new AnalysisFrontPage(this.openPage);
 
-		await chromeStore.set({
-			pageMode: "tired",
-			breakTill: "0",
-			pageData: JSON.stringify({
-				status: "OK",
-				content: "Entry added to DB",
-				got_emotion: false,
-				timestamp: "2021-03-21 19:10:45.577554+00:00",
-				emotion: ["sadness"],
-				quote: [
-					"Ahhhh that sucks, Just let it all go, relax and connect with your own being",
-				],
-			}),
-		});
-
 		this.openPage();
 	}
 
@@ -559,21 +544,22 @@ class AnalysisFrontPage extends Page {
 		data["user-emotions"].map((elem, i) => {
 			let date = new Date(elem.timestamp);
 			let date2 = null;
-			if (i == data["user-emotions"].length-1) 
-				date2 = date
-			else  {
-				date2 = new Date(data["user-emotions"][i+1].timestamp);
+			if (i == data["user-emotions"].length - 1) date2 = date;
+			else {
+				date2 = new Date(data["user-emotions"][i + 1].timestamp);
 			}
 			innerH += `
 			<div class="container ${i % 2 == 0 ? "left" : "right"}">
 				<div class="content">
-					<h2>${date.toTimeString().slice(0, 8)} -  ${date2.toTimeString().slice(0, 8)}</h2>
+					<h2>${date.toTimeString().slice(0, 8)} -  ${date2
+				.toTimeString()
+				.slice(0, 8)}</h2>
 					<table>
 					<thead>
 						<tr>
-							<th><img src="./assets/final_emoji/${ top_3[i][0][0] }.gif" height ="64px"> </th>
-							<th><img src="./assets/final_emoji/${ top_3[i][1][0] }.gif" height ="32px"> </th>
-							<th><img src="./assets/final_emoji/${ top_3[i][2][0] }.gif" height ="32px"> </th>
+							<th><img src="./assets/final_emoji/${top_3[i][0][0]}.gif" height ="64px"> </th>
+							<th><img src="./assets/final_emoji/${top_3[i][1][0]}.gif" height ="32px"> </th>
+							<th><img src="./assets/final_emoji/${top_3[i][2][0]}.gif" height ="32px"> </th>
 						</tr>
 					</thead>
 					<tbody>
