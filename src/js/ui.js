@@ -1,6 +1,8 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
+const BASE_URL = "http://localhost:8000";
+
 const clean = (html) => {
 	let doc = new DOMParser().parseFromString(html, "text/html");
 	return doc.body.textContent || "";
@@ -184,9 +186,41 @@ class MainPage extends Page {
 
 class DistractPage extends Page {
 	heading = null;
-	constructor() {
+	mainButton = null;
+	subButton = null;
+	openPage = null;
+
+	async setup() {
+		await chromeStore.set({ pageMode: "" });
+	}
+
+	async handleClose(type) {
+		const store = await chromeStore.getAll();
+		const pageData = JSON.parse(store.pageData);
+		const resp = fetch(
+			`${BASE_URL}/utils/face-detect-response/${encodeURI(
+				pageData.pk
+			)}/${encodeURI(type)}/`
+		);
+
+		this.openPage();
+	}
+
+	constructor(openPage) {
 		super("#page-distract");
 		this.heading = $("#page-distract .page-content h3");
+		this.mainButton = $("#page-distract .page-content .button-main");
+		this.subButton = $("#page-distract .page-content .button-subtle");
+
+		this.openPage = openPage;
+
+		this.mainButton.addEventListener("click", () => {
+			this.handleClose("Yes");
+		});
+		this.subButton.addEventListener("click", () => {
+			this.handleClose("No");
+		});
+
 		this.heading.innerHTML = `Hey${
 			userName.get() ? " " + userName.get() : ""
 		}, seems like you're getting distracted<br />😳`;
@@ -198,13 +232,66 @@ class EmotionPage extends Page {
 	text = null;
 	mainBtn = null;
 	subBtn = null;
-	constructor() {
-		super("#page-emotion");
+	openPage = null;
 
+	async openMain() {
+		await chromeStore.set({ pageMode: "" });
+		this.isOpen = false;
+		this.openPage();
+	}
+
+	async init() {
+		const store = await chromeStore.getAll();
+
+		let data;
+		try {
+			data = JSON.parse(store.pageData);
+		} catch (err) {
+			return this.openMain();
+		}
+
+		if (
+			!Array.isArray(data.emotion) ||
+			!Array.isArray(data.quote) ||
+			data.emotion.length < 1 ||
+			data.quote.length < 1
+		) {
+			return this.openMain();
+		}
+
+		const { emotion, quote } = data;
+
+		this.heading.innerHTML = `Hey! We think that you feel <span>${
+			emotion.length === 1 ? emotion[0] : emotion.join(", ")
+		}</span>`;
+
+		this.text.innerHTML = `
+			<ul> ${quote.map((rem) => `<li>${rem}</li>`).join("")} </ul>`;
+	}
+
+	async handleBreak() {
+		await chromeStore.set({
+			breakTill: `${new Date().getTime() + 10 * 60 * 1000}`,
+		});
+		this.openMain();
+	}
+
+	async handleCont() {
+		this.openMain();
+		window.close();
+	}
+
+	constructor(openPage) {
+		super("#page-emotion");
+		this.handleBreak = this.handleBreak.bind(this);
+		this.handleCont = this.handleCont.bind(this);
+		this.openPage = openPage;
 		this.heading = $("#page-emotion .page-content h3");
 		this.text = $("#page-emotion .page-content p");
 		this.mainBtn = $("#page-emotion .page-content .button-main");
 		this.subBtn = $("#page-emotion .page-content .button-subtle");
+		this.mainBtn.addEventListener("click", this.handleBreak);
+		this.subBtn.addEventListener("click", this.handleCont);
 	}
 }
 
@@ -287,12 +374,11 @@ class Orchestrator {
 	async openPage() {
 		const store = await chromeStore.getAll();
 		this.closeAll();
+
 		if (!userName.get()) {
 			this.pages.setup.isOpen = true;
 			return;
 		}
-
-		console.log(`store`, store);
 
 		if (inTime(store, "breakTill")) {
 			this.pages.break.isOpen = true;
@@ -321,10 +407,26 @@ class Orchestrator {
 		const { pages } = this;
 		pages.main = new MainPage(this.openPage);
 		pages.setup = new SetupPage(this.openPage);
-		pages.emotion = new EmotionPage();
-		pages.distract = new DistractPage();
+		pages.emotion = new EmotionPage(this.openPage);
+		pages.distract = new DistractPage(this.openPage);
 		pages.break = new BreakPage(this.openPage);
 		pages.analysis = new AnalysisFrontPage(this.openPage);
+
+		await chromeStore.set({
+			pageMode: "tired",
+			breakTill: "0",
+			pageData: JSON.stringify({
+				status: "OK",
+				content: "Entry added to DB",
+				got_emotion: false,
+				timestamp: "2021-03-21 19:10:45.577554+00:00",
+				emotion: ["sadness"],
+				quote: [
+					"Ahhhh that sucks, Just let it all go, relax and connect with your own being",
+				],
+			}),
+		});
+
 		this.openPage();
 	}
 
@@ -446,7 +548,7 @@ class AnalysisFrontPage extends Page {
 	}
 
 	async getData() {
-		let url = "http://127.0.0.1:8000/utils/analysis"; //TODO
+		let url = `${BASE_URL}/utils/analysis`; //TODO
 		let response = await fetch(url);
 		let resData = await response.json();
 		return resData;

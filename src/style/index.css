@@ -16,7 +16,7 @@
 	--green: #1bd6ae;
 	--dark-green: #09bb94;
 	--yellow: #ffd95c;
-	--dark-yellow: #0a0701;
+	--dark-yellow: #f8b13e;
 
 	--theme-gradient: linear-gradient(45deg, var(--red), var(--theme));
 	--warn-gradient: linear-gradient(45deg, var(--red), var(--dark-yellow));
@@ -317,9 +317,18 @@ body {
 	text-align: center;
 }
 
+.page-warn .page-content ul {
+	width: 90%;
+	margin: auto;
+}
+
 .page-warn .page-content h3 {
 	font-size: 1.4rem;
 	margin-top: 20px;
+}
+
+.page-warn .page-content span {
+	color: var(--theme);
 }
 
 .page-warn .page-content p {
