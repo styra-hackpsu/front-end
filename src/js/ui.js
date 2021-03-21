@@ -307,25 +307,23 @@ class DistractPage extends Page {
 
 document.addEventListener("DOMContentLoaded", () => {
 	// const mainPage = new MainPage();
+	// pageMode -> distracted, tired, else(normal), analysis  
+	// pageData -> extra data
+	// chrome.storage.local.remove(["tabIdGlobal"]);
+	// chrome.storage.local.set({ tabIdGlobal: tab.id });
 
-	const distractPage = new DistractPage();
-
-	const setupPage = new SetupPage(() => {
-		distractPage.isOpen = true;
-	});
+	chrome.storage.local.get(["pageMode"], ({ pageMode }) => {
+		if (pageMode === "distracted") {
+			const distractPage = new DistractPage();
 	
-	
-});
-
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-	console.log(request) 
-	if (request.state) {
-		// open popup
-	}
-	if (request.state === "tired") {
-		// set screen to tired
-	}
-	if (request.state === "distracted") {
-		// set screen to distracted
-	}
+			const setupPage = new SetupPage(() => {
+				distractPage.isOpen = true;
+			});
+		} else {
+			const mainPage = new MainPage();
+			const setupPage = new SetupPage(() => {
+				mainPage.isOpen = true;
+			});
+		}
+	});	
 });
