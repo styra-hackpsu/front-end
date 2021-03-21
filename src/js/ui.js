@@ -305,13 +305,154 @@ class DistractPage extends Page {
 	}
 }
 
+class AnalysisFrontPage extends Page {
+	heading = null;
+	analysis_data = null;
+	dummyData = {
+		"user-keywords": [
+			{
+				"timestamp": "2021-03-23 23:32:46.401451+00:00",
+				"context-switch": true,
+				"url": ""
+			},
+		],
+		"user-emotions": [
+			{
+				"timestamp": "2021-03-20 23:32:16.401451+00:00",
+				"simple-emotions": {
+					"additional_properties": {},
+					"anger": 0.0,
+					"contempt": 0.0,
+					"disgust": 0.0,
+					"fear": 0.0,
+					"happiness": 1.0,
+					"neutral": 0.0,
+					"sadness": 0.0,
+					"surprise": 0.0
+				},
+				"complex-emotions": {
+					'non_vigilant':0.9 ,
+					'tired':0.1,
+					'alert':0
+				}
+			},
+			{
+				"timestamp": "2021-03-29 23:32:26.401451+00:00",
+				"simple-emotions": {
+					"additional_properties": {},
+					"anger": 0.0,
+					"contempt": 0.0,
+					"disgust": 0.0,
+					"fear": 0.0,
+					"happiness": 1.0,
+					"neutral": 0.0,
+					"sadness": 0.0,
+					"surprise": 0.0
+				},
+				"complex-emotions": {
+					'non_vigilant':0.9 ,
+					'tired':0.1,
+					'alert':0
+				}
+			}
+		]
+	};
+
+
+	checkBetweenTimeRanges (ctxs, tim1 , tim2) {
+		let count = 0
+		ctxs.forEach((elem, i) => {
+			let time = parseInt(Date.parse( elem.timestamp));
+			let x  = (time > tim2 ) && ( time <= tim1 )
+			count += x ? 1 : 0
+		})
+		return count
+	}
+
+	preprocessData (data) {
+		
+		//emotions
+		let emotions = data["user-emotions"]
+
+		emotions = emotions.sort((first, second) => {
+			return Date.parse(second.timestamp) - Date.parse(first.timestamp);
+		});	
+
+		let top_3 = emotions.map ((elem) => {
+			let  dict =  { ...elem["complex-emotions"] , ...elem["simple-emotions"] } 
+			var items = Object.keys(dict).map(function(key) {
+				return [key, dict[key]];
+			  });
+				items.sort(function(first, second) {
+				return second[1] - first[1];
+			  });
+			
+			
+			return (items.slice(0, 3));
+		});
+		// keywords
+		let n = emotions.length
+
+		let ctxChangedTimestamps = data["user-keywords"]
+		let ctx = []
+		for (let i = 0; i< n-1 ;i ++) {
+			let tim1 = parseInt(Date.parse(emotions[i].timestamp));
+			let tim2 = parseInt(Date.parse(emotions[i+1].timestamp));
+			ctx.push(this.checkBetweenTimeRanges(ctxChangedTimestamps, tim1,tim2));
+		}
+
+		return [top_3, data, ctx]
+	}
+
+	async getData () {
+		let url = "http://127.0.0.1:8000/utils/analysis"  			//TODO
+		let response = await fetch(url);
+		let resData = await response.json();
+		return resData;
+	}
+
+	createTimeline ([top_3, data, ctx]) {
+		let innerH = "";
+		data['user-emotions'].map((elem, i) => {
+			let date = new Date(elem.timestamp)
+			innerH +=  `
+			<div class="container ${i%2 ==0 ? 'left' : 'right'}">
+				<div class="content">
+					<h2>${date.toTimeString().slice(0,8)}</h2>
+					<strong><span>${top_3[i][0][1]}</span></strong> <img src="./assets/final_emoji/${top_3[i][0][0]}.gif" height ="64px"> 
+					<strong><span>${top_3[i][1][1]}</span></strong> <img src="./assets/final_emoji/${top_3[i][1][0]}.gif" height ="32px"> 
+					<strong><span>${top_3[i][2][1]}</span></strong> <img src="./assets/final_emoji/${top_3[i][2][0]}.gif" height ="32px"> 
+					<p> <strong >${i == top_3.length - 1 ? "" : ctx[i]} </strong> Context Switches </p>
+				</div>
+			</div>
+			`
+		})
+		document.getElementById("timeline").innerHTML = innerH;
+	}
+	
+	async init_ () {
+		// this.analysis_data = await this.getData()
+		;
+		this.createTimeline(this.preprocessData(this.dummyData));
+		return 1
+	}
+	
+	constructor() {
+		super("#page-analysis");
+		this.isOpen = true;
+	}
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-	// const mainPage = new MainPage();
+	const analysisFrontPage = new AnalysisFrontPage();
+	
+	analysisFrontPage.init_();
 
-	const distractPage = new DistractPage();
-
+	// const distractPage = new DistractPage();
+	
 	const setupPage = new SetupPage(() => {
-		distractPage.isOpen = true;
+		// distractPage.isOpen = false;
+		analysisFrontPage.isOpen = true;
 	});
 	
 	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
