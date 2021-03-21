@@ -8,11 +8,10 @@ let executeScript = async (fun) => {
     if (!tabIdGlobal) {
       const tab = await chrome.tabs.create({
         active: false,
-        url: "https://www.google.com/",
+        url: "https://www.google.com",
         pinned: true,
       });
       chrome.storage.local.set({ tabIdGlobal: tab.id });
-      // tabIdGlobal = tab.id;
       chrome.tabs.onUpdated.addListener(async function (
         tabId,
         changeInfo,
@@ -27,13 +26,34 @@ let executeScript = async (fun) => {
         }
       });
     } else {
-      await chrome.scripting.executeScript({
-        target: { tabId: tabIdGlobal },
-        function: fun,
-      });
+      await chrome.scripting.executeScript(
+        {
+          target: { tabId: tabIdGlobal },
+          function: fun,
+        },
+        async () => {
+          const tabOpen = await checkTabStillOpen(tabIdGlobal);
+          if (!tabOpen) {
+            chrome.storage.local.remove(["tabIdGlobal"]);
+          }
+        }
+      );
     }
   });
 };
+
+async function checkTabStillOpen(pinnedTabId) {
+  return new Promise(function (resolve, reject) {
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach((tab) => {
+        if (tab.id === pinnedTabId) {
+          resolve(true);
+        }
+      });
+      resolve(false);
+    });
+  });
+}
 
 let getAccess = async () => {
   navigator.mediaDevices
