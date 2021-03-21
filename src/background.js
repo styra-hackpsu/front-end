@@ -117,14 +117,38 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  // chrome.windows.getAll((windows) => windows[0]).width
-  if (request.popup_open_new_tab) {
-    chrome.windows.create({
-      height: 600,
-      width: 400,
-      // top: ,
-      type: "popup",
-      url: "popup.html",
-    });
-  }
+  chrome.storage.local.get(["popupWindowId"], ({ popupWindowId }) => {
+    if (!popupWindowId) {
+      chrome.windows.getCurrent((window) => {
+        if (request.popup_open_new_tab) {
+          const width = 400;
+          const height = 600;
+          chrome.windows.create(
+            {
+              height: height,
+              width: width,
+              top: parseInt(window.height / 2 - height / 2),
+              left: parseInt(window.width / 2 - width / 2),
+              type: "popup",
+              url: "popup.html",
+            },
+            (window) => {
+              chrome.storage.local.set({ popupWindowId: window.id });
+            }
+          );
+        }
+      });
+    }
+  });
 });
+
+chrome.windows.onRemoved.addListener((windowId) => {
+  chrome.storage.local.get(["popupWindowId"], ({ popupWindowId }) => {
+    if (!popupWindowId) {
+      return;
+    } else if (popupWindowId === windowId) {
+      chrome.storage.local.remove("popupWindowId");
+    }
+  });
+});
+// TODO : JSON.stringify() extra data
