@@ -8,21 +8,22 @@
 
 :root {
 	font-size: 12pt;
-	--red: #ff415a;
+	--red: #ff2945;
 
-	--theme: #5793ff;
+	--theme: #3b93ff;
 
 	--blue: #5c5eff;
 	--green: #1bd6ae;
 	--dark-green: #09bb94;
 	--yellow: #ffd95c;
-	--dark-yellow: #ffb641;
+	--dark-yellow: #0a0701;
 
 	--theme-gradient: linear-gradient(45deg, var(--red), var(--theme));
 	--warn-gradient: linear-gradient(45deg, var(--red), var(--dark-yellow));
 	--calm-gradient: linear-gradient(45deg, var(--green), var(--theme));
 
-	--dark-blue: rgb(21, 27, 63);
+	--dark-blue: #1e1f55;
+	--dark-blue-2: #16172f;
 
 	--bg: #fff;
 	--bg-dark: #f5f5f5;
@@ -90,7 +91,18 @@ body {
 
 .header-logo {
 	height: 70px;
-	margin: 10px 0;
+	margin: 10px;
+}
+
+.header-main-logo-group {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.header-main-logo-group .header-logo {
+	height: 50px;
+	/* margin: 0 10px !important; */
 }
 
 .header-name {
@@ -158,9 +170,19 @@ body {
 	z-index: 1;
 }
 
+.button-light {
+	border-color: var(--bg);
+	color: var(--bg);
+}
+
 .button:hover {
 	color: var(--bg);
 	background-color: var(--theme);
+}
+
+.button-light:hover {
+	color: var(--theme);
+	background-color: var(--bg);
 }
 
 .button::after,
@@ -182,6 +204,11 @@ body {
 
 .button::after {
 	left: 75%;
+}
+
+.button-light::after,
+.button-light::before {
+	background-color: var(--bg);
 }
 
 .button:hover::after,
@@ -213,8 +240,43 @@ body {
 	content: none;
 }
 
+.toggle {
+	position: relative;
+	height: 40px;
+	width: 90px;
+	border-radius: 20px;
+	margin-top: 10px;
+	border: 2px solid var(--bg);
+	transition: background-color 0.2s ease-out;
+	cursor: pointer;
+}
+
+.toggle-head {
+	position: absolute;
+	top: 50%;
+	left: 3px;
+	height: 30px;
+	width: 30px;
+	border-radius: 50%;
+	background-color: rgba(255, 255, 255, 0.7);
+	transform: translateY(-50%);
+	transition: background-color 0.2s ease-out, left 0.2s ease-out;
+	box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-active {
+	background-color: var(--bg);
+}
+
+.toggle-active .toggle-head {
+	left: calc(90px - 30px - 6px);
+	background-color: var(--theme);
+}
+
 #page-main {
 	background-color: var(--bg);
+	color: #111;
+	transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #page-main-canvas {
@@ -225,15 +287,21 @@ body {
 
 #page-main-heading {
 	font-size: 1.3rem;
-	margin-top: 50px;
+	margin-top: 20px;
 	text-align: center;
+}
+
+#page-main-help {
+	font-weight: 500;
+	font-size: 1rem;
+	margin-top: 20px;
 }
 
 #page-main-text {
 	font-size: 1.1rem;
 	margin-top: 20px;
 	font-weight: 500;
-	color: var(--text-light-2);
+	opacity: 0.7;
 	text-align: center;
 }
 

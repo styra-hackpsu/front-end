@@ -52,8 +52,19 @@
 
 		<main class="page" id="page-main">
 			<header class="header-main">
-				<img class="header-logo" src="./assets/logo.svg" alt="Logo" />
-				<h3 class="header-name">Styra</h3>
+				<section class="header-main-logo-group">
+					<img
+						class="header-logo"
+						src="./assets/logo.svg"
+						alt="Logo"
+					/>
+					<h3 class="header-name">Styra</h3>
+				</section>
+				<button class="button button-light">See Analysis 🤔</button>
+				<h5 id="page-main-help">Snooze Mode</h5>
+				<div class="toggle">
+					<div class="toggle-head"></div>
+				</div>
 			</header>
 			<main class="page-content">
 				<h3 id="page-main-heading"></h3>
@@ -85,15 +96,18 @@
 			</main>
 		</main>
 
-		<main class="page" id="page-analysis">			
+		<main class="page" id="page-analysis">
 			<header class="header-main">
-				<button>
-					Back
-				</button><h3 class="header-name">See how you have been doing ... </h3>
+				<button class="button button-emoji button-light">
+					👈 Back
+				</button>
+				<h3 class="header-name">See how you have been doing</h3>
 			</header>
-			<main class="page-content" style="overflow-y: scroll; height: 500px;"> 
-				<div id="timeline" class = "timeline">
-				</div>
+			<main
+				class="page-content"
+				style="overflow-y: scroll; height: 500px"
+			>
+				<div id="timeline" class="timeline"></div>
 			</main>
 		</main>
 
@@ -117,7 +131,7 @@
 			</header>
 			<main class="page-content">
 				<h3>In a break 🧘</h3>
-				<h2>1m 20s</h2>
+				<h2></h2>
 
 				<p>
 					Take a few minutes and walk around your home. You deserve to

@@ -33,7 +33,7 @@ const inTime = (store, key) => {
 	if (isNaN(till) || till === 0 || till - new Date() <= 0) {
 		return false;
 	}
-	return till - new Date();
+	return till - new Date().getTime();
 };
 
 class Page {
@@ -120,7 +120,10 @@ class SetupPage extends Page {
 class MainPage extends Page {
 	waves = null;
 	heading = null;
-
+	toggle = null;
+	analysisButton = null;
+	inSnooze = false;
+	openPage = null;
 	setup() {
 		this.heading.innerHTML = `Keep crushing it,<br />${userName.get()} 💪`;
 		this.waves.start();
@@ -131,10 +134,51 @@ class MainPage extends Page {
 
 	init() {}
 
-	constructor() {
+	updateSnooze = async function (e) {
+		const store = await chromeStore.getAll();
+		this.inSnooze = Number(store.snoozeTill) === -1;
+
+		if (e !== false) {
+			this.inSnooze = !this.inSnooze;
+			await chromeStore.set({ snoozeTill: this.inSnooze ? "-1" : "0" });
+		}
+
+		if (this.inSnooze) {
+			if (!this.toggle.classList.contains("toggle-active")) {
+				this.toggle.classList.add("toggle-active");
+			}
+			$(this.selector).style.backgroundColor = "#16172f";
+			$(this.selector).style.color = "#fff";
+		} else {
+			if (this.toggle.classList.contains("toggle-active")) {
+				this.toggle.classList.remove("toggle-active");
+			}
+			$(this.selector).style.backgroundColor = "#fff";
+			$(this.selector).style.color = "#111";
+		}
+	};
+
+	openAnalysis = async function () {
+		await chromeStore.set({ pageMode: "analysis" });
+		this.isOpen = false;
+		this.openPage();
+	};
+
+	constructor(openPage) {
 		super("#page-main");
+		this.updateSnooze = this.updateSnooze.bind(this);
+		this.openAnalysis = this.openAnalysis.bind(this);
 		this.heading = $("#page-main-heading");
 		this.waves = new window.Waves();
+
+		this.openPage = openPage;
+
+		this.updateSnooze(false);
+
+		this.toggle = $("#page-main .toggle");
+		this.toggle.addEventListener("click", this.updateSnooze);
+		this.analysisButton = $("#page-main .header-main .button-light");
+		this.analysisButton.addEventListener("click", this.openAnalysis);
 	}
 }
 
@@ -174,14 +218,14 @@ class BreakPage extends Page {
 	onDone = null;
 
 	updateUI(left) {
-		const mins = Math.floor(left / 1000);
-		const secs = Math.floor(left - (mins * 60000) / 1000);
+		const mins = Math.floor(left / 60000);
+		const secs = Math.floor((left - mins * 60000) / 1000);
 		this.time.innerHTML = `${mins}m ${secs}s`;
 	}
 
 	async handleClose() {
 		clearInterval(this.timer);
-		this.updateUI(new Date());
+		this.updateUI(0);
 		await chromeStore.set({ breakTill: "0" });
 		this.isOpen = false;
 		if (typeof this.onDone === "function") {
@@ -189,24 +233,44 @@ class BreakPage extends Page {
 		}
 	}
 
+	tick = async () => {
+		const store = await chromeStore.getAll();
+		const till = inTime(store, "breakTill");
+		if (!till) {
+			this.handleClose();
+		} else {
+			this.updateUI(till);
+		}
+	};
+
 	setup() {
-		this.timer = setInterval(async () => {
-			const store = await chromeStore.getAll();
-			const till = inTime(store, "breakTill");
-			if (!till) {
-				this.handleClose();
-			} else {
-				this.updateUI(till);
-			}
-		}, 1000);
+		this.tick();
+		this.timer = setInterval(this.tick, 1000);
 	}
+
+	handleMoreTime = async () => {
+		const store = await chromeStore.getAll();
+		const till = inTime(store, "breakTill");
+		if (!till) {
+			return;
+		}
+		await chromeStore.set({
+			breakTill: new Date().getTime() + till + 5 * 60 * 1000,
+		});
+		this.tick();
+	};
 
 	constructor(onDone) {
 		super("#page-break");
+		this.tick = this.tick.bind(this);
+		this.handleClose = this.handleClose.bind(this);
+		this.handleMoreTime = this.handleMoreTime.bind(this);
 		this.time = $("#page-break .page-content h2");
 		this.text = $("#page-break .page-content p");
 		this.mainBtn = $("#page-break .page-content .button-main");
 		this.subBtn = $("#page-break .page-content .button-subtle");
+		this.mainBtn.addEventListener("click", this.handleMoreTime);
+		this.subBtn.addEventListener("click", this.handleClose);
 		this.onDone = onDone;
 	}
 }
@@ -227,6 +291,8 @@ class Orchestrator {
 			this.pages.setup.isOpen = true;
 			return;
 		}
+
+		console.log(`store`, store);
 
 		if (inTime(store, "breakTill")) {
 			this.pages.break.isOpen = true;
@@ -253,7 +319,7 @@ class Orchestrator {
 
 	async init() {
 		const { pages } = this;
-		pages.main = new MainPage();
+		pages.main = new MainPage(this.openPage);
 		pages.setup = new SetupPage(this.openPage);
 		pages.emotion = new EmotionPage();
 		pages.distract = new DistractPage();
@@ -272,6 +338,9 @@ class Orchestrator {
 class AnalysisFrontPage extends Page {
 	heading = null;
 	analysis_data = null;
+	backButton = null;
+	openPage = null;
+
 	dummyData = {
 		"user-keywords": [
 			{
@@ -320,6 +389,12 @@ class AnalysisFrontPage extends Page {
 				},
 			},
 		],
+	};
+
+	openMain = async function () {
+		await chromeStore.set({ pageMode: "" });
+		this.isOpen = false;
+		this.openPage();
 	};
 
 	checkBetweenTimeRanges(ctxs, tim1, tim2) {
@@ -417,8 +492,12 @@ class AnalysisFrontPage extends Page {
 		return 1;
 	}
 
-	constructor() {
+	constructor(openPage) {
 		super("#page-analysis");
+		this.openMain = this.openMain.bind(this);
+		this.openPage = openPage;
+		this.backButton = $("#page-analysis .header-main .button-light");
+		this.backButton.addEventListener("click", this.openMain);
 	}
 }
 

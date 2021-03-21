@@ -89,7 +89,7 @@ window.Waves = class {
 
 	setDims() {
 		const { height, width } = this.el.getBoundingClientRect();
-		this.canvas.height = height * 0.3;
+		this.canvas.height = height * 0.2;
 		this.canvas.width = width;
 	}
 
@@ -112,7 +112,7 @@ window.Waves = class {
 			new Wave(
 				this.canvas,
 				this.ctx,
-				{ a: 1.2, b: 1 / 250, c: 0, d: 4, e: 20 },
+				{ a: 0.8, b: 1 / 250, c: 0, d: 4, e: 20 },
 				{ a: 0.6, b: 1 / 200, c: 0.5 },
 				Waves.colors[0],
 				3
@@ -122,7 +122,7 @@ window.Waves = class {
 			new Wave(
 				this.canvas,
 				this.ctx,
-				{ a: 1.4, b: 1 / 200, c: 7, d: 4, e: 30 },
+				{ a: 0.9, b: 1 / 200, c: 7, d: 3.6, e: 30 },
 				{ a: 0.4, b: 1 / 300, c: 0.5 },
 				Waves.colors[1],
 				3
@@ -132,7 +132,7 @@ window.Waves = class {
 			new Wave(
 				this.canvas,
 				this.ctx,
-				{ a: 1.2, b: 1 / 250, c: 4, d: 4, e: 40 },
+				{ a: 0.9, b: 1 / 250, c: 4, d: 4, e: 40 },
 				{ a: 0.6, b: 1 / 350, c: 0.5 },
 				Waves.colors[2],
 				3
