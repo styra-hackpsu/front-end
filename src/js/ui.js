@@ -84,16 +84,18 @@ class Page {
 	}
 
 	close() {
-		gsap.to(this.selector, {
-			opacity: 0,
-			y: -Page.moveBy,
-			duration: Page.duration,
-			ease: Page.ease,
-		}).then(() => {
-			if (!this.isOpen) {
-				$(this.selector).style.display = "none";
-			}
-		});
+		gsap
+			.to(this.selector, {
+				opacity: 0,
+				y: -Page.moveBy,
+				duration: Page.duration,
+				ease: Page.ease,
+			})
+			.then(() => {
+				if (!this.isOpen) {
+					$(this.selector).style.display = "none";
+				}
+			});
 	}
 }
 
@@ -108,10 +110,7 @@ class SetupPage extends Page {
 	}
 
 	init() {
-		$("#page-setup-done").addEventListener(
-			"click",
-			this.handleDone.bind(this)
-		);
+		$("#page-setup-done").addEventListener("click", this.handleDone.bind(this));
 	}
 	constructor(next) {
 		super("#page-setup");
@@ -246,30 +245,28 @@ class EmotionPage extends Page {
 		let data;
 		try {
 			data = JSON.parse(store.pageData);
+			if (
+				!data ||
+				!Array.isArray(data.emotion) ||
+				!Array.isArray(data.quote) ||
+				data.emotion.length < 1 ||
+				data.quote.length < 1
+			) {
+				throw new Error("Invalid data");
+			}
 		} catch (err) {
-			console.error("ERR_EMO: Invalid JSON!");
-			this.openMain();
-			return window.close();
-		}
-
-		if (
-			!Array.isArray(data.emotion) ||
-			!Array.isArray(data.quote) ||
-			data.emotion.length < 1 ||
-			data.quote.length < 1
-		) {
-			console.error(
-				"ERR_EMO: No emotions sent, but got_emotions is set!"
-			);
-
-			this.openMain();
-			return window.close();
+			console.error("ERR_EMO: Invalid emotion data!");
+			this.heading.innerHTML = `Hey! We think that you are distracted`;
+			this.text.innerHTML = ``;
+			return;
 		}
 
 		const { emotion, quote } = data;
 
 		this.heading.innerHTML = `Hey! We think that you feel <span>${
-			emotion.length === 1 ? emotion[0] : emotion.join(", ")
+			emotion.length === 1
+				? emotion[0].split("_").join(" ")
+				: emotion.join(", ")
 		}</span>`;
 
 		this.text.innerHTML = `
@@ -531,9 +528,7 @@ class AnalysisFrontPage extends Page {
 		for (let i = 0; i < n - 1; i++) {
 			let tim1 = parseInt(Date.parse(emotions[i].timestamp));
 			let tim2 = parseInt(Date.parse(emotions[i + 1].timestamp));
-			ctx.push(
-				this.checkBetweenTimeRanges(ctxChangedTimestamps, tim1, tim2)
-			);
+			ctx.push(this.checkBetweenTimeRanges(ctxChangedTimestamps, tim1, tim2));
 		}
 
 		return [top_3, data, ctx];

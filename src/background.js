@@ -18,53 +18,43 @@ let executeScript = async (fun) => {
 		async ({ snoozeTill, breakTill }) => {
 			if (!inTime(Number(snoozeTill)) && !inTime(Number(breakTill))) {
 				chrome.runtime.sendMessage({ popup_open: true });
-				chrome.storage.local.get(
-					["tabIdGlobal"],
-					async ({ tabIdGlobal }) => {
-						if (!tabIdGlobal) {
-							const tab = await chrome.tabs.create({
-								active: false,
-								url: "https://styra-landing.netlify.app/",
-								pinned: true,
-							});
-							chrome.storage.local.set({ tabIdGlobal: tab.id });
-							chrome.tabs.onUpdated.addListener(async function (
-								tabId,
-								changeInfo,
-								tab
-							) {
-								if (
-									tabId === tabIdGlobal &&
-									changeInfo.status == "complete"
-								) {
-									tabIdGlobal = tabId;
-									await chrome.scripting.executeScript({
-										target: { tabId: tabId },
-										function: fun,
-									});
-								}
-							});
-						} else {
-							await chrome.scripting.executeScript(
-								{
-									target: { tabId: tabIdGlobal },
+				chrome.storage.local.get(["tabIdGlobal"], async ({ tabIdGlobal }) => {
+					if (!tabIdGlobal) {
+						const tab = await chrome.tabs.create({
+							active: false,
+							url: "https://styra-landing.netlify.app/",
+							pinned: true,
+						});
+						chrome.storage.local.set({ tabIdGlobal: tab.id });
+						chrome.tabs.onUpdated.addListener(async function (
+							tabId,
+							changeInfo,
+							tab
+						) {
+							if (tabId === tabIdGlobal && changeInfo.status == "complete") {
+								tabIdGlobal = tabId;
+								await chrome.scripting.executeScript({
+									target: { tabId: tabId },
 									function: fun,
-								},
-								async () => {
-									const tabOpen = await checkTabStillOpen(
-										tabIdGlobal
-									);
-									if (!tabOpen) {
-										chrome.storage.local.remove([
-											"tabIdGlobal",
-										]);
-										executeScript(getAccess);
-									}
+								});
+							}
+						});
+					} else {
+						await chrome.scripting.executeScript(
+							{
+								target: { tabId: tabIdGlobal },
+								function: fun,
+							},
+							async () => {
+								const tabOpen = await checkTabStillOpen(tabIdGlobal);
+								if (!tabOpen) {
+									chrome.storage.local.remove(["tabIdGlobal"]);
+									executeScript(getAccess);
 								}
-							);
-						}
+							}
+						);
 					}
-				);
+				});
 			}
 		}
 	);
@@ -154,7 +144,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 				if (request.popup_open_new_tab) {
 					const width = 400;
 					const height = 600;
-					console.log(`IN HERE!! OPENIGN!!`);
+					console.log(`IN HERE!! OPENING!!`);
 					chrome.windows.create(
 						{
 							height: height,

@@ -28,8 +28,7 @@ window.Wave = class {
 			this.canvas.height -
 			(this.ampFn.a * Math.sin(this.ampFn.b * t) + this.ampFn.c) *
 				(Math.exp(
-					this.waveFn.a *
-						Math.sin(this.waveFn.b * (x + t) + this.waveFn.c) +
+					this.waveFn.a * Math.sin(this.waveFn.b * (x + t) + this.waveFn.c) +
 						this.waveFn.d
 				) -
 					this.waveFn.e)
@@ -43,10 +42,7 @@ window.Wave = class {
 		this.canvas = canvas;
 		this.color = color;
 		this.dotSize = dotSize;
-		window.addEventListener(
-			"mousemove",
-			({ pageX }) => (this.mouseX = pageX)
-		);
+		window.addEventListener("mousemove", ({ pageX }) => (this.mouseX = pageX));
 	}
 
 	render(time) {
@@ -82,7 +78,7 @@ window.Waves = class {
 	el = null;
 	canvas = null;
 	ctx = null;
-	speed = 2.4;
+	speed = 1;
 
 	t = 0;
 	waves = [];
